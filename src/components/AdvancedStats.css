@@ -1,3 +1,36 @@
+/* Help tooltip styles for question mark icon */
+.help-tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+.help-icon {
+  color: #0ea5e9;
+  cursor: pointer;
+  margin-left: 2px;
+  vertical-align: middle;
+}
+.help-tooltip-text {
+  visibility: hidden;
+  width: max-content;
+  background: #0ea5e9;
+  color: #fff;
+  text-align: center;
+  border-radius: 0.5rem;
+  padding: 0.3rem 0.7rem;
+  position: absolute;
+  z-index: 10;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.2s;
+  font-size: 0.95rem;
+  pointer-events: none;
+}
+.help-tooltip-container:hover .help-tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
 /* KeywordCloud background */
 .keyword-cloud-bg {
   background-color: #000;

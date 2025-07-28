@@ -1,0 +1,59 @@
+.softskills-section {
+  background: linear-gradient(120deg, #f0fdfa 0%, #f9fafb 100%);
+  border-radius: 1.25rem;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.04);
+  border: 1px solid #e0f2fe;
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  margin-bottom: 2rem;
+}
+.softskills-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 0.5rem;
+}
+.softskill-tag, .actionverb-tag {
+  display: inline-block;
+  padding: 0.5rem 1.1rem;
+  border-radius: 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0.25rem 0.4rem 0.25rem 0;
+  border: 1.5px solid #e0e7ef;
+  background: #f1f5f9;
+  color: #64748b;
+  opacity: 0.7;
+  transition: box-shadow 0.2s, transform 0.2s, opacity 0.2s, background 0.2s, color 0.2s;
+  cursor: default;
+  letter-spacing: 0.01em;
+}
+.softskill-tag.found {
+  background: linear-gradient(90deg, #d1fae5 0%, #bbf7d0 100%);
+  color: #047857;
+  border-color: #6ee7b7;
+  box-shadow: 0 0 0 3px #a7f3d0, 0 2px 8px 0 rgba(16,185,129,0.10);
+  opacity: 1;
+  transform: scale(1.06) rotate(-2deg);
+  z-index: 1;
+}
+.actionverb-tag.found {
+  background: linear-gradient(90deg, #e0f2fe 0%, #bae6fd 100%);
+  color: #0369a1;
+  border-color: #7dd3fc;
+  box-shadow: 0 0 0 3px #bae6fd, 0 2px 8px 0 rgba(59,130,246,0.10);
+  opacity: 1;
+  transform: scale(1.06) rotate(2deg);
+  z-index: 1;
+}
+.softskill-tag:hover, .actionverb-tag:hover {
+  opacity: 1;
+  background: #f0fdfa;
+  color: #0f172a;
+  box-shadow: 0 2px 12px 0 rgba(16,185,129,0.10);
+  transform: scale(1.08) rotate(0deg);
+}
+.softskills-section .section-desc {
+  color: #64748b;
+  font-size: 0.92rem;
+  margin-top: 1.2rem;
+}

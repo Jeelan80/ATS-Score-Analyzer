@@ -1,13 +1,20 @@
 import React from 'react';
 import Card from './Card';
+import { HelpCircle } from 'lucide-react';
 import 'tippy.js/dist/tippy.css';
 import './BuzzwordGlow.css';
 import Gauge from './Gauge';
 import StatHero from './StatHero';
-// import { faFileAlt, faClock } from '@fortawesome/free-solid-svg-icons';
 import KeywordCloudComponent from './KeywordCloud';
 import { AnalysisResult } from '../types';
 import './AdvancedStats.css';
+import './BuzzwordSection.css';
+import './SoftSkillsSection.css';
+import './MissingKeywordsSection.css';
+import ResumeSectionCoverage from './ResumeSectionCoverage';
+import './ResumeSectionCoverage.css';
+import KeywordHeatmapSection from './KeywordHeatmapSection';
+import './KeywordHeatmapSection.css';
 
 interface AdvancedStatsProps {
   results: AnalysisResult;
@@ -29,7 +36,13 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
   return (
     <>
       <Card>
-        <h4 className="text-lg font-semibold mb-2 text-gray-800">Skill Match Breakdown</h4>
+        <h4 className="text-lg font-semibold mb-2 text-gray-800 flex items-center gap-2">
+          Skill Match Breakdown
+          <span className="help-tooltip-container">
+            <HelpCircle className="help-icon" size={18} />
+            <span className="help-tooltip-text">Shows what % of job-required skills are present in your resume.</span>
+          </span>
+        </h4>
         <div className="flex items-center space-x-4">
           <div className="w-32 h-32 flex items-center justify-center">
             {/* Improved pie chart using SVG, not cut off */}
@@ -66,7 +79,13 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
 
       {/* Resume Keyword Cloud */}
       <Card>
-        <h4 className="text-lg font-semibold mb-2 text-gray-800">Resume Keyword Cloud</h4>
+        <h4 className="text-lg font-semibold mb-2 text-gray-800 flex items-center gap-2">
+          Resume Keyword Cloud
+          <span className="help-tooltip-container">
+            <HelpCircle className="help-icon" size={18} />
+            <span className="help-tooltip-text">Visualizes the most frequent keywords in your resume. Bigger = more frequent.</span>
+          </span>
+        </h4>
         {/* Non-overlapping word cloud using measurement and placement */}
         <div className="cloud-area-modern">
           {/* Generate real keyword frequency data for the cloud */}
@@ -136,91 +155,92 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
       </Card>
 
       {/* Buzzword & Filler Word Detector */}
-      <Card>
+      <Card className="buzzword-section">
         <h4 className="text-lg font-semibold mb-2 text-gray-800">Buzzword & Filler Word Detector</h4>
-        <div className="mb-2 text-sm font-semibold text-gray-700">Buzzwords:</div>
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="buzzword-label">Buzzwords:</div>
+        <div className="mb-4">
           {['hardworking','synergy','dynamic','go-getter','results-driven','innovative','passionate','motivated','strategic','proactive','detail-oriented','self-starter','team player','fast learner','visionary','guru','rockstar','ninja','thought leader','disruptive'].map(word => {
             const present = (results.resumeText ?? '').toLowerCase().includes(word);
             const suggestion = `Instead of "${word}", describe a specific achievement or role.`;
-            return present ? (
+            return (
               <span
                 key={word}
-                className="px-3 py-1 rounded text-xs font-semibold border transition-all duration-200 bg-yellow-100 text-yellow-700 border-yellow-300 buzzword-glow tippy"
-                data-tippy-content={suggestion}
+                className={`buzzword-tag${present ? ' found' : ''} tippy`}
+                data-tippy-content={present ? suggestion : undefined}
               >
                 {word}
               </span>
-            ) : (
-              <span key={word} className="px-3 py-1 rounded text-xs font-semibold border transition-all duration-200 bg-gray-100 text-gray-400 border-gray-200 opacity-60">{word}</span>
             );
           })}
         </div>
-        <div className="mb-2 text-sm font-semibold text-gray-700">Filler Phrases:</div>
-        <div className="flex flex-wrap gap-2">
+        <div className="buzzword-label">Filler Phrases:</div>
+        <div>
           {['responsible for','helped with','worked on','participated in','assisted with','involved in','tasked with','contributed to','supported','assisted','aided','made sure','ensured','took part in'].map(phrase => {
             const present = (results.resumeText ?? '').toLowerCase().includes(phrase);
             const suggestion = `Try to replace "${phrase}" with a specific, impactful description.`;
-            return present ? (
+            return (
               <span
                 key={phrase}
-                className="px-3 py-1 rounded text-xs font-semibold border transition-all duration-200 bg-orange-100 text-orange-700 border-orange-300 buzzword-glow orange tippy"
-                data-tippy-content={suggestion}
+                className={`filler-tag${present ? ' found' : ''} tippy`}
+                data-tippy-content={present ? suggestion : undefined}
               >
                 {phrase}
               </span>
-            ) : (
-              <span key={phrase} className="px-3 py-1 rounded text-xs font-semibold border transition-all duration-200 bg-gray-100 text-gray-400 border-gray-200 opacity-60">{phrase}</span>
             );
           })}
         </div>
-
-        <div className="mt-2 text-xs text-gray-500">Yellow/Orange = present, Gray = not found. Try to replace these with specific, impactful language.</div>
+        <div className="section-desc">Yellow/Orange = present, Gray = not found. Try to replace these with specific, impactful language.</div>
       </Card>
 
       {/* Soft Skills & Action Verbs Detection */}
-      <Card>
+      <Card className="softskills-section">
         <h4 className="text-lg font-semibold mb-2 text-gray-800">Soft Skills & Action Verbs Detection</h4>
-        <div className="mb-2 text-sm font-semibold text-gray-700">Soft Skills:</div>
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="softskills-label">Soft Skills:</div>
+        <div className="mb-4">
           {['teamwork','leadership','communication','problem solving','adaptability','creativity','time management','collaboration','initiative','critical thinking','organization','flexibility','work ethic','attention to detail','empathy'].map(skill => {
             const present = (results.resumeText ?? '').toLowerCase().includes(skill);
             return (
-              <span key={skill} className={`px-3 py-1 rounded text-xs font-semibold border transition-all duration-200 ${present ? 'bg-green-100 text-green-700 border-green-300' : 'bg-gray-100 text-gray-400 border-gray-200 opacity-60'}`}>{skill}</span>
+              <span key={skill} className={`softskill-tag${present ? ' found' : ''}`}>{skill}</span>
             );
           })}
         </div>
-        <div className="mb-2 text-sm font-semibold text-gray-700">Action Verbs:</div>
-        <div className="flex flex-wrap gap-2">
+        <div className="softskills-label">Action Verbs:</div>
+        <div>
           {['led','managed','developed','designed','implemented','created','improved','achieved','coordinated','analyzed','built','launched','initiated','delivered','organized','increased','reduced','solved','mentored','presented','negotiated','researched','supported','trained','streamlined','executed'].map(verb => {
             const present = (results.resumeText ?? '').toLowerCase().includes(verb);
             return (
-              <span key={verb} className={`px-3 py-1 rounded text-xs font-semibold border transition-all duration-200 ${present ? 'bg-cyan-100 text-cyan-700 border-cyan-300' : 'bg-gray-100 text-gray-400 border-gray-200 opacity-60'}`}>{verb}</span>
+              <span key={verb} className={`actionverb-tag${present ? ' found' : ''}`}>{verb}</span>
             );
           })}
         </div>
-        <div className="mt-2 text-xs text-gray-500">Green/Cyan = present, Gray = missing (detected by keyword match)</div>
+        <div className="section-desc">Green/Cyan = present, Gray = missing (detected by keyword match)</div>
       </Card>
 
       {/* Top Missing Keywords Suggestions */}
       {results.keywordAnalysis.missingKeywords.length > 0 && (
-        <div className="mb-8">
-          <h4 className="text-lg font-semibold mb-2 text-gray-800">Top Missing Keywords Suggestions</h4>
-          <ul className="space-y-2">
+        <Card className="missing-keywords-section">
+          <h4>Top Missing Keywords Suggestions</h4>
+          <ul className="missing-keywords-list">
             {results.keywordAnalysis.missingKeywords.slice(0, 5).map((keyword) => (
-              <li key={keyword} className="bg-pink-50 border border-pink-200 rounded p-3 flex items-start space-x-3">
-                <span className="text-pink-500 font-bold">{keyword}</span>
-                <span className="text-xs text-gray-700">Try to naturally include this keyword in your resume, e.g., in your skills, experience, or summary section.</span>
+              <li key={keyword} className="missing-keyword-card">
+                <span className="missing-keyword-badge">{keyword}</span>
+                <span className="missing-keyword-desc">Try to naturally include this keyword in your resume, e.g., in your skills, experience, or summary section.</span>
               </li>
             ))}
           </ul>
-          <div className="mt-2 text-xs text-gray-500">Add these keywords to improve your match score.</div>
-        </div>
+          <div className="section-desc">Add these keywords to improve your match score.</div>
+        </Card>
       )}
 
       {/* Keyword Density Analysis */}
       <Card>
-        <h4 className="text-lg font-semibold mb-2 text-gray-800">Keyword Density Analysis</h4>
+        <h4 className="text-lg font-semibold mb-2 text-gray-800 flex items-center gap-2">
+          Keyword Density Analysis
+          <span className="help-tooltip-container">
+            <HelpCircle className="help-icon" size={18} />
+            <span className="help-tooltip-text">Shows how often each keyword appears in your resume.</span>
+          </span>
+        </h4>
         <div className="space-y-2">
           {results.keywordAnalysis.matchingKeywords.concat(results.keywordAnalysis.missingKeywords).map((keyword) => {
             // Count occurrences in resumeText (case-insensitive)
@@ -261,53 +281,29 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
 
       {/* Keyword Coverage Heatmap */}
       <Card>
-        <h4 className="text-lg font-semibold mb-2 text-gray-800">Keyword Coverage Heatmap</h4>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-          {results.keywordAnalysis.matchingKeywords.concat(results.keywordAnalysis.missingKeywords).map((keyword) => {
-            const isMissing = results.keywordAnalysis.missingKeywords.includes(keyword);
-            return (
-              <div
-                key={keyword}
-                className={`px-3 py-2 rounded text-center text-xs font-semibold shadow-sm transition-all duration-200
-                  ${isMissing ? 'bg-pink-100 text-pink-500 border border-pink-300 opacity-60' : 'bg-cyan-100 text-cyan-700 border border-cyan-300 opacity-100'}`}
-                title={isMissing ? 'Missing from resume' : 'Present in resume'}
-              >
-                {keyword}
-              </div>
-            );
-          })}
-        </div>
-        <div className="mt-2 text-xs text-gray-500">Pink = missing, Cyan = present</div>
+        <h4 className="text-lg font-semibold mb-2 text-gray-800 flex items-center gap-2">
+          Keyword Coverage Heatmap
+          <span className="help-tooltip-container">
+            <HelpCircle className="help-icon" size={18} />
+            <span className="help-tooltip-text">See which job keywords are present or missing in your resume.</span>
+          </span>
+        </h4>
+        <KeywordHeatmapSection
+          matchingKeywords={results.keywordAnalysis.matchingKeywords}
+          missingKeywords={results.keywordAnalysis.missingKeywords}
+        />
       </Card>
       {/* Resume Section Coverage */}
-      <div className="mb-8">
-        <h4 className="text-lg font-semibold mb-2 text-gray-800">Resume Section Coverage</h4>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-          {[
-            { label: 'Summary', keywords: ['summary', 'profile', 'objective'] },
-            { label: 'Skills', keywords: ['skills', 'technologies', 'competencies'] },
-            { label: 'Experience', keywords: ['experience', 'employment', 'work history'] },
-            { label: 'Education', keywords: ['education', 'degree', 'university', 'college'] },
-            { label: 'Projects', keywords: ['projects', 'portfolio'] },
-            { label: 'Certifications', keywords: ['certification', 'certifications', 'certificate'] },
-            { label: 'Awards', keywords: ['award', 'honor', 'achievement'] },
-            { label: 'Languages', keywords: ['languages', 'language'] },
-          ].map(section => {
-            const present = section.keywords.some(kw => (results.resumeText ?? '').toLowerCase().includes(kw));
-            return (
-              <div
-                key={section.label}
-                className={`flex items-center px-3 py-2 rounded text-xs font-semibold shadow-sm border transition-all duration-200
-                  ${present ? 'bg-green-100 text-green-700 border-green-300' : 'bg-gray-100 text-gray-400 border-gray-200 opacity-60'}`}
-                title={present ? 'Section found in resume' : 'Section not found'}
-              >
-                <span className="mr-2">{present ? '✔️' : '❌'}</span> {section.label}
-              </div>
-            );
-          })}
-        </div>
-        <div className="mt-2 text-xs text-gray-500">Green = present, Gray = missing (detected by keywords)</div>
-      </div>
+      <Card>
+        <h4 className="text-lg font-semibold mb-2 text-gray-800 flex items-center gap-2">
+          Resume Section Coverage
+          <span className="help-tooltip-container">
+            <HelpCircle className="help-icon" size={18} />
+            <span className="help-tooltip-text">Checks if your resume includes all important sections (like Skills, Education, etc).</span>
+          </span>
+        </h4>
+        <ResumeSectionCoverage resumeText={results.resumeText ?? ''} />
+      </Card>
     </>
   );
 };
