@@ -1,0 +1,6 @@
+.buzzword-glow {
+  box-shadow: 0 0 8px 2px #fde68a !important;
+}
+.buzzword-glow.orange {
+  box-shadow: 0 0 8px 2px #fdba74 !important;
+}

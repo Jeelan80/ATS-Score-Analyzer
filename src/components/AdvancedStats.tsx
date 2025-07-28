@@ -1,5 +1,10 @@
 import React from 'react';
 import Card from './Card';
+import 'tippy.js/dist/tippy.css';
+import './BuzzwordGlow.css';
+import Gauge from './Gauge';
+import StatHero from './StatHero';
+// import { faFileAlt, faClock } from '@fortawesome/free-solid-svg-icons';
 import KeywordCloudComponent from './KeywordCloud';
 import { AnalysisResult } from '../types';
 import './AdvancedStats.css';
@@ -92,20 +97,38 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
           const text = (results.resumeText ?? '').replace(/\s+/g, ' ').trim();
           const wordCount = text ? text.split(' ').length : 0;
           const readingTime = wordCount ? Math.max(1, Math.round(wordCount / 200)) : 0; // 200 wpm
-          // Simple Flesch-Kincaid-like score: 206.835 - 1.015*(words/sentences) - 84.6*(syllables/words)
           const sentences = text.split(/[.!?]+/).filter(Boolean).length || 1;
           const syllables = text.split(/\b/).reduce((acc, word) => acc + (word.match(/[aeiouy]+/gi)?.length || 0), 0);
           const fkScore = wordCount ? Math.round(206.835 - 1.015 * (wordCount / sentences) - 84.6 * (syllables / wordCount)) : 0;
           let lengthStatus = '';
-          if (wordCount < 250) lengthStatus = 'Too short (add more detail)';
-          else if (wordCount > 900) lengthStatus = 'Too long (consider condensing)';
-          else lengthStatus = 'Good length';
+          type ColorType = 'green' | 'yellow' | 'red';
+          let lengthColor: ColorType = 'green';
+          if (wordCount < 250) { lengthStatus = 'Too short (add more detail)'; lengthColor = 'red'; }
+          else if (wordCount > 900) { lengthStatus = 'Too long (consider condensing)'; lengthColor = 'red'; }
+          else { lengthStatus = 'Good length'; lengthColor = 'green'; }
+          let readabilityColor: ColorType = 'green';
+          if (fkScore < 50) readabilityColor = 'red';
+          else if (fkScore < 60) readabilityColor = 'yellow';
+          else readabilityColor = 'green';
+          const getColor = (color: ColorType) => color === 'green' ? '#22c55e' : color === 'yellow' ? '#eab308' : '#ef4444';
           return (
-            <div className="flex flex-col gap-2 text-sm">
-              <div><span className="font-semibold">Word count:</span> {wordCount}</div>
-              <div><span className="font-semibold">Estimated reading time:</span> {readingTime} min</div>
-              <div><span className="font-semibold">Readability score:</span> {fkScore} <span className="text-xs text-gray-500">(higher is easier to read)</span></div>
-              <div><span className="font-semibold">Length status:</span> <span className={lengthStatus.includes('Good') ? 'text-green-600' : 'text-pink-600'}>{lengthStatus}</span></div>
+            <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
+              <div className="flex flex-col gap-4 items-center md:items-start">
+                <StatHero icon="📄" value={wordCount} label="Word count" colorClass="blue" />
+                <StatHero icon="⏱️" value={`${readingTime} min`} label="Estimated reading time" colorClass="blue" />
+              </div>
+              <div className="flex flex-col gap-4 items-center md:items-start">
+                <div className="flex flex-col items-center">
+                  <Gauge value={fkScore} max={100} text={`${fkScore}`} color={getColor(readabilityColor)} />
+                  <div className="mt-2 text-sm font-semibold">Readability score</div>
+                  <div className="text-xs text-gray-500">(higher is easier to read)</div>
+                </div>
+                <div className="flex flex-col items-center">
+                  <Gauge value={wordCount > 900 ? 900 : wordCount} max={900} text={lengthStatus === 'Good length' ? '✔' : wordCount.toString()} color={getColor(lengthColor)} />
+                  <div className="mt-2 text-sm font-semibold">Length status</div>
+                  <div className={`text-xs font-bold ${lengthColor === 'green' ? 'text-green-600' : 'text-red-600'}`}>{lengthStatus}</div>
+                </div>
+              </div>
             </div>
           );
         })()}
@@ -119,8 +142,17 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
         <div className="flex flex-wrap gap-2 mb-4">
           {['hardworking','synergy','dynamic','go-getter','results-driven','innovative','passionate','motivated','strategic','proactive','detail-oriented','self-starter','team player','fast learner','visionary','guru','rockstar','ninja','thought leader','disruptive'].map(word => {
             const present = (results.resumeText ?? '').toLowerCase().includes(word);
-            return (
-              <span key={word} className={`px-3 py-1 rounded text-xs font-semibold border transition-all duration-200 ${present ? 'bg-yellow-100 text-yellow-700 border-yellow-300' : 'bg-gray-100 text-gray-400 border-gray-200 opacity-60'}`}>{word}</span>
+            const suggestion = `Instead of "${word}", describe a specific achievement or role.`;
+            return present ? (
+              <span
+                key={word}
+                className="px-3 py-1 rounded text-xs font-semibold border transition-all duration-200 bg-yellow-100 text-yellow-700 border-yellow-300 buzzword-glow tippy"
+                data-tippy-content={suggestion}
+              >
+                {word}
+              </span>
+            ) : (
+              <span key={word} className="px-3 py-1 rounded text-xs font-semibold border transition-all duration-200 bg-gray-100 text-gray-400 border-gray-200 opacity-60">{word}</span>
             );
           })}
         </div>
@@ -128,11 +160,21 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
         <div className="flex flex-wrap gap-2">
           {['responsible for','helped with','worked on','participated in','assisted with','involved in','tasked with','contributed to','supported','assisted','aided','made sure','ensured','took part in'].map(phrase => {
             const present = (results.resumeText ?? '').toLowerCase().includes(phrase);
-            return (
-              <span key={phrase} className={`px-3 py-1 rounded text-xs font-semibold border transition-all duration-200 ${present ? 'bg-orange-100 text-orange-700 border-orange-300' : 'bg-gray-100 text-gray-400 border-gray-200 opacity-60'}`}>{phrase}</span>
+            const suggestion = `Try to replace "${phrase}" with a specific, impactful description.`;
+            return present ? (
+              <span
+                key={phrase}
+                className="px-3 py-1 rounded text-xs font-semibold border transition-all duration-200 bg-orange-100 text-orange-700 border-orange-300 buzzword-glow orange tippy"
+                data-tippy-content={suggestion}
+              >
+                {phrase}
+              </span>
+            ) : (
+              <span key={phrase} className="px-3 py-1 rounded text-xs font-semibold border transition-all duration-200 bg-gray-100 text-gray-400 border-gray-200 opacity-60">{phrase}</span>
             );
           })}
         </div>
+
         <div className="mt-2 text-xs text-gray-500">Yellow/Orange = present, Gray = not found. Try to replace these with specific, impactful language.</div>
       </Card>
 

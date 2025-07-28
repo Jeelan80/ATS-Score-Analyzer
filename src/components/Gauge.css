@@ -1,0 +1,15 @@
+.gauge-container {
+  display: inline-block;
+}
+.gauge-size-80 {
+  width: 80px;
+  height: 80px;
+}
+.gauge-size-100 {
+  width: 100px;
+  height: 100px;
+}
+.gauge-size-120 {
+  width: 120px;
+  height: 120px;
+}

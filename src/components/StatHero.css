@@ -1,0 +1,13 @@
+.stat-hero-value {
+  font-size: 2rem;
+  font-weight: bold;
+}
+.stat-hero-value.blue {
+  color: #0ea5e9;
+}
+.stat-hero-value.green {
+  color: #22c55e;
+}
+.stat-hero-value.red {
+  color: #ef4444;
+}
