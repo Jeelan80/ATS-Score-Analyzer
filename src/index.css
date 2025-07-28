@@ -1,0 +1,149 @@
+/* Navbar custom blur utility */
+.navbar-blur {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+/* Navbar Animations */
+.animate-navbar-fade-in {
+  animation: navbarFadeIn 0.9s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes navbarFadeIn {
+  from { opacity: 0; transform: translateY(-32px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-navbar-logo-spin {
+  animation: navbarLogoSpin 2.5s linear infinite;
+}
+@keyframes navbarLogoSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.animate-navbar-sparkle {
+  animation: navbarSparkle 1.2s ease-in-out infinite alternate;
+}
+@keyframes navbarSparkle {
+  0% { filter: drop-shadow(0 0 0px #fff8); }
+  100% { filter: drop-shadow(0 0 8px #fff) drop-shadow(0 0 16px #0ff8); }
+}
+.animate-navbar-title-glow {
+  animation: navbarTitleGlow 2.2s ease-in-out infinite alternate;
+}
+@keyframes navbarTitleGlow {
+  0% { text-shadow: 0 0 0px #0ff, 0 0 0px #a0f; }
+  100% { text-shadow: 0 0 8px #0ff, 0 0 16px #a0f; }
+}
+.animate-navbar-github-bounce {
+  animation: navbarGithubBounce 1.4s cubic-bezier(0.4,0,0.2,1) infinite alternate;
+}
+@keyframes navbarGithubBounce {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-4px) scale(1.08); }
+}
+.animate-navbar-link-fade {
+  animation: navbarLinkFade 2.2s ease-in-out infinite alternate;
+}
+@keyframes navbarLinkFade {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+/* Fixed neon cursor glow for grid background */
+.neon-cursor-fixed-glow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 520px;
+  height: 520px;
+  opacity: 0;
+  z-index: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(34,255,110,0.18) 0%, rgba(0,255,128,0.10) 40%, rgba(0,0,0,0.01) 80%, transparent 100%);
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+/* Neon Cursor Glow Effect */
+.neon-cursor-glow {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10;
+  background: radial-gradient(circle, #0ff8 0%, #a0f6 40%, transparent 80%);
+  mix-blend-mode: lighten;
+  left: var(--neon-cursor-x, -200px);
+  top: var(--neon-cursor-y, -200px);
+  opacity: 0;
+  /* No transition for instant follow */
+}
+.neon-cursor-glow[data-visible="true"] {
+  opacity: 1;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Neon/Space Theme Utilities */
+.neon-text {
+  text-shadow: 0 0 8px #fff, 0 0 16px #0ff, 0 0 32px #a0f, 0 0 64px #f0f;
+}
+.drop-shadow-neon {
+  filter: drop-shadow(0 0 8px #0ff) drop-shadow(0 0 16px #a0f);
+}
+.neon-panel {
+  box-shadow: 0 0 24px 4px #0ff3, 0 0 48px 8px #a0f2;
+  border: 1.5px solid #fff2;
+  backdrop-filter: blur(2px);
+}
+.neon-btn {
+  box-shadow: 0 0 12px 2px #0ff7, 0 0 24px 4px #a0f5;
+}
+.neon-subtext {
+  text-shadow: 0 0 4px #fff5, 0 0 8px #0ff2;
+}
+
+/* Animated Neon Grid Background */
+@keyframes moveGrid {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 200px 200px, 400px 400px;
+  }
+}
+.animate-stars {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  background:
+    linear-gradient(90deg, #0ff3 1px, transparent 1px 50px),
+    linear-gradient(0deg, #0ff3 1px, transparent 1px 50px),
+    linear-gradient(90deg, #a0f2 1px, transparent 1px 100px),
+    linear-gradient(0deg, #a0f2 1px, transparent 1px 100px);
+  background-size: 50px 50px, 50px 50px, 100px 100px, 100px 100px, auto;
+  background-position: 0 0, 0 0, 0 0, 0 0, 0 0;
+  animation: moveGrid 30s linear infinite;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.7;
+  filter: blur(0.5px) brightness(1.2) saturate(1.5);
+}
+
+/* Neon radial overlay for cursor glow */
+.neon-cursor-overlay {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(34,255,110,0.35) 0%, rgba(0,255,128,0.18) 50%, transparent 80%);
+  opacity: 0;
+  transition: opacity 0.15s;
+  will-change: transform, opacity;
+}
+.neon-cursor-overlay[data-visible="true"] {
+  opacity: 1;
+}

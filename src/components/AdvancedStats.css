@@ -1,0 +1,55 @@
+/* KeywordCloud background */
+.keyword-cloud-bg {
+  background-color: #000;
+  padding: 20px;
+}
+
+/* Modern cloud area style (no rounded corners, subtle gradient, soft shadow, thin border) */
+.cloud-area-modern {
+  width: 600px;
+  height: 320px;
+  min-width: 600px;
+  min-height: 320px;
+  background: linear-gradient(135deg, #1a2233 60%, #223355 100%);
+  /* No border, no box-shadow for a clean ellipse */
+  overflow: hidden;
+  position: relative;
+  border-radius: 32px;
+}
+/* Pie chart skill match transition */
+.pie-skill-transition {
+  transition: stroke-dasharray 0.5s;
+}
+/* Bar width transition for keyword density */
+.bar-width-transition {
+  transition: width 0.5s;
+  width: var(--bar-width, 0%);
+}
+
+/* Resume Keyword Cloud area and words */
+.cloud-area {
+  width: 400px;
+  height: 200px;
+  min-width: 400px;
+  min-height: 200px;
+  position: relative;
+  overflow: hidden;
+}
+.cloud-word {
+  left: var(--cloud-left);
+  top: var(--cloud-top);
+  z-index: var(--cloud-z);
+  pointer-events: auto;
+  position: absolute;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+}
+
+.bg-cloud-dark {
+  background: #181c23;
+}
+
+.vertical-word {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  letter-spacing: 2px;
+}
