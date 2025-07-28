@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './ResultsSection.css';
 import { AdvancedStats } from './AdvancedStats';
 import { ScoreCard } from './ScoreCard';
 import { ExtractedInfo } from './ExtractedInfo';
@@ -16,8 +17,8 @@ export const ResultsSection: React.FC<ResultsSectionProps> = ({ results }) => {
   return (
     <div className="space-y-8">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Analysis Results</h2>
-        <p className="text-gray-600">Here's how your resume matches the job description</p>
+        <h2 className="text-3xl font-extrabold mb-2 text-white drop-shadow-lg results-title-glow">Analysis Results</h2>
+        <p className="text-lg font-semibold text-white/90 drop-shadow-sm results-subtitle-glow">Here's how your resume matches the job description</p>
       </div>
       <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1">

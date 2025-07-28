@@ -73,8 +73,44 @@ export async function extractTextFromPDF(file: File): Promise<PDFExtractedInfo> 
         }
       }
     }
-    const emailMatch = fullText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-    if (emailMatch) foundEmail = emailMatch[0];
+
+    // Extract all possible gmail addresses, including obfuscated forms
+    // 1. Standard gmail (strict: no dots/dashes before @ unless allowed by Gmail)
+    const gmailRegex = /\b([a-zA-Z0-9](?:[a-zA-Z0-9._%+-]{0,62}[a-zA-Z0-9])?)@gmail\.com\b/g;
+    // 2. Obfuscated: (at), [at], {at}, spaces, etc
+    const obfuscatedGmailRegex = /\b([a-zA-Z0-9](?:[a-zA-Z0-9._%+-]{0,62}[a-zA-Z0-9])?)\s*(\(|\[|\{|<)?\s*at\s*(\)|\]|\}|>)?\s*gmail\s*(\.|dot|\s)+\s*com\b/gi;
+
+    let gmailCandidates: string[] = [];
+    // Standard
+    gmailCandidates.push(...Array.from(fullText.matchAll(gmailRegex)).map(m => m[0]));
+    // Obfuscated
+    let match;
+    while ((match = obfuscatedGmailRegex.exec(fullText)) !== null) {
+      // Normalize to standard form
+      gmailCandidates.push(match[1] + '@gmail.com');
+    }
+    // Remove duplicates
+    gmailCandidates = Array.from(new Set(gmailCandidates));
+    // Filter out artifacts and invalid usernames (no dots/dashes at start/end, no double dots, length 6-30)
+    gmailCandidates = gmailCandidates.filter(email => {
+      const username = email.split('@')[0];
+      return (
+        /^[a-zA-Z0-9](?!.*\.\.)[a-zA-Z0-9._%+-]{4,28}[a-zA-Z0-9]$/.test(username) &&
+        !/noreply|example|test|your@email|dummy|sample/i.test(email)
+      );
+    });
+    if (gmailCandidates.length > 0) {
+      foundEmail = gmailCandidates[0];
+    } else {
+      // Fallback: any email
+      const allEmails = Array.from(fullText.matchAll(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g)).map(m => m[0]);
+      const filteredEmails = allEmails.filter(email =>
+        !/noreply|example|test|your@email|dummy|sample|\[at\]|\(at\)/i.test(email)
+      );
+      if (filteredEmails.length > 0) {
+        foundEmail = filteredEmails[0];
+      }
+    }
 
     return {
       text: fullText.trim(),

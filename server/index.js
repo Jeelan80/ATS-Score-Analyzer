@@ -118,8 +118,17 @@ ${jobDescriptionText}
       });
     }
 
-    // Ensure matchScore is within valid range
-    analysisData.matchScore = Math.max(0, Math.min(100, Math.round(analysisData.matchScore)));
+
+    // --- Robust, deterministic match score calculation (Jaccard similarity) ---
+    const norm = (arr) => Array.from(new Set((arr || []).map(s => s.trim().toLowerCase())));
+    const matching = norm(analysisData.keywordAnalysis.matchingKeywords);
+    const missing = norm(analysisData.keywordAnalysis.missingKeywords);
+    const all = Array.from(new Set([...matching, ...missing]));
+    let matchScore = 0;
+    if (all.length > 0) {
+      matchScore = Math.round((matching.length / all.length) * 100);
+    }
+    analysisData.matchScore = matchScore;
 
     // Ensure arrays exist for keyword analysis
     if (!analysisData.keywordAnalysis) {
