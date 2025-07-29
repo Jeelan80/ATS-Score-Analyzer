@@ -12,7 +12,7 @@ export const JobDescriptionInput: React.FC<JobDescriptionInputProps> = ({
   disabled = false,
 }) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 min-w-0 break-words">
       <label className="block text-sm font-medium text-gray-700 mb-2">
         Job Description
       </label>
@@ -22,7 +22,7 @@ export const JobDescriptionInput: React.FC<JobDescriptionInputProps> = ({
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
         placeholder="Paste the full job description here..."
-        className="w-full h-40 p-4 border border-gray-300 rounded-lg resize-y focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:bg-gray-50 disabled:cursor-not-allowed"
+        className="w-full h-32 sm:h-40 p-3 sm:p-4 border border-gray-300 rounded-lg resize-y focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:bg-gray-50 disabled:cursor-not-allowed text-xs sm:text-sm break-words break-all"
         rows={6}
       />
       

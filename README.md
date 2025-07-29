@@ -1,123 +1,113 @@
 # ATS Resume Analyzer
 
-A modern, full-stack web application that analyzes resumes against job descriptions using AI to help candidates optimize their applications for Applicant Tracking Systems (ATS).
+![MIT License](https://img.shields.io/badge/license-MIT-green)
+![Author](https://img.shields.io/badge/author-Jeelan80-blue)
+![GitHub Repo](https://img.shields.io/badge/repo-ATS--Score--Analyzer-blue?logo=github)
+
+---
+
+ATS Resume Analyzer is a modern, open-source web application that helps you optimize your resume for Applicant Tracking Systems (ATS) using AI. Upload your resume, paste a job description, and get instant feedback, keyword analysis, and improvement suggestions—all in a beautiful, interactive interface.
 
 ## Features
 
-- **PDF Resume Upload**: Drag-and-drop or click to upload PDF resumes with client-side text extraction
-- **Job Description Analysis**: Paste job descriptions for comprehensive matching analysis
-- **AI-Powered Analysis**: Uses Google Gemini API for intelligent resume evaluation
-- **Match Scoring**: Get percentage-based compatibility scores with visual indicators
-- **Keyword Analysis**: Identify matching and missing keywords between resume and job description
-- **Contact Extraction**: Automatically extract candidate information from resumes
-- **Improvement Suggestions**: Receive personalized feedback to optimize your resume
-- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
+- **PDF Resume Upload**: Drag-and-drop or click to upload your PDF resume. Text is extracted securely in your browser.
+- **Job Description Analysis**: Paste any job description to see how well your resume matches.
+- **AI-Powered Scoring**: Uses Google Gemini API to analyze and score your resume against the job description.
+- **Keyword Analysis**: Instantly see which keywords are present or missing.
+- **Contact Extraction**: Automatically extracts your LinkedIn, GitHub, and email from your resume.
+- **Improvement Suggestions**: Get actionable feedback to boost your chances.
+- **Modern UI**: Responsive, visually engaging, and easy to use on any device.
 
 ## Tech Stack
 
-- **Frontend**: React 18 + TypeScript + Vite
-- **Backend**: Express.js + Node.js
-- **Styling**: Tailwind CSS
-- **PDF Processing**: PDF.js (client-side)
+- **Frontend**: React 18, TypeScript, Vite, Tailwind CSS
+- **Backend**: Node.js, Express.js
+- **PDF Parsing**: PDF.js (client-side)
 - **AI Integration**: Google Gemini API
 - **Icons**: Lucide React
 
 ## Getting Started
 
 ### Prerequisites
-
 - Node.js 18+ and npm
 - Google AI Studio account (for Gemini API key)
 
 ### Installation
 
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd ats-resume-analyzer
-```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Jeelan80/ATS-Score-Analyzer.git
+   cd ATS-Score-Analyzer
+   ```
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+3. **Set up environment variables:**
+   - Copy `.env.example` to `.env` and fill in your Gemini API key:
+     ```env
+     GEMINI_API_KEY=your_actual_gemini_api_key_here
+     VITE_API_URL=http://localhost:3001
+     PORT=3001
+     ```
+4. **Start the application:**
+   ```bash
+   npm run dev:full
+   ```
+   - Or start frontend and backend separately:
+     ```bash
+     npm run dev:server   # Backend
+     npm run dev         # Frontend
+     ```
 
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Set up environment variables:
-```bash
-cp .env.example .env
-```
-
-4. Get your Google Gemini API key:
-   - Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-   - Create a new API key
-   - Copy the key to your `.env` file
-
-5. Configure your environment variables in `.env`:
-```env
-GEMINI_API_KEY=your_actual_gemini_api_key_here
-VITE_API_URL=http://localhost:3001
-PORT=3001
-```
-
-6. Start the application:
-```bash
-# Start both frontend and backend
-npm run dev:full
-
-# Or start them separately:
-# Terminal 1 - Backend server
-npm run dev:server
-
-# Terminal 2 - Frontend development server
-npm run dev
-```
-
-The application will be available at:
+The app will be available at:
 - Frontend: http://localhost:5173
-- Backend API: http://localhost:3001
+- Backend: http://localhost:3001
 
-## API Setup
+## Usage
 
-### Google Gemini API
-
-1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Create a new API key
-3. Add the key to your `.env` file as `GEMINI_API_KEY`
+1. **Upload Resume**: Drag-and-drop or click to select your PDF resume.
+2. **Paste Job Description**: Copy and paste the job description for your target role.
+3. **Analyze**: Click "Analyze Resume" to get your match score, keyword analysis, and suggestions.
+4. **Review Results**: See your compatibility score, extracted info, keyword matches, and improvement tips.
+5. **Start Over**: Use "Start New Analysis" to try again with a different resume or job description.
 
 ## Project Structure
 
 ```
-├── src/                    # Frontend React application
-│   ├── components/         # React components
-│   │   ├── Header.tsx     # Application header
-│   │   ├── InputSection.tsx # File upload and job description input
-│   │   ├── ActionPanel.tsx # Analysis trigger button
-│   │   ├── ResultsSection.tsx # Analysis results display
+├── src/                      # Frontend React app
+│   ├── components/           # All UI components
+│   │   ├── ActionPanel.tsx
+│   │   ├── ErrorDisplay.tsx
+│   │   ├── ExtractedInfo.tsx
+│   │   ├── Feedback.tsx
+│   │   ├── Header.tsx
+│   │   ├── InputSection.tsx
+│   │   ├── JobDescriptionInput.tsx
+│   │   ├── KeywordAnalysis.tsx
+│   │   ├── ResultsSection.tsx
+│   │   ├── ResumeUploader.tsx
+│   │   ├── ScoreCard.tsx
 │   │   └── ...
-│   ├── services/          # API integration
-│   ├── utils/             # Utility functions (PDF parsing)
-│   ├── types/             # TypeScript type definitions
-│   └── App.tsx           # Main application component
-├── server/                # Backend Express server
-│   └── index.js          # Main server file with API endpoints
-├── .env                  # Environment variables
-└── package.json          # Dependencies and scripts
+│   ├── services/             # API integration (e.g., api.ts)
+│   ├── utils/                # Utility functions (e.g., pdfParser.ts)
+│   ├── types/                # TypeScript type definitions
+│   ├── App.tsx               # Main application component
+│   ├── index.css             # Global styles
+│   └── main.tsx              # App entry point
+├── server/                   # Backend Express server
+│   └── index.js              # Main server file with API endpoints
+├── public/                   # Static assets (e.g., Author.jpg)
+├── .env                      # Environment variables
+├── package.json              # Dependencies and scripts
+├── README.md                 # Project documentation
+└── ...
 ```
-
-## Usage
-
-1. **Start the Application**: Run `npm run dev:full` to start both frontend and backend
-2. **Upload Resume**: Click the upload area or drag-and-drop a PDF resume
-3. **Add Job Description**: Paste the complete job description in the text area
-4. **Analyze**: Click the "Analyze Resume" button to start the AI analysis
-5. **Review Results**: View your match score, extracted information, keyword analysis, and improvement suggestions
-6. **Start Over**: Use the "Start New Analysis" button for additional analyses
 
 ## API Endpoints
 
 ### POST /api/analyze-resume
-
-Analyzes a resume against a job description.
+Analyze a resume against a job description.
 
 **Request Body:**
 ```json
@@ -126,7 +116,6 @@ Analyzes a resume against a job description.
   "jobDescriptionText": "string"
 }
 ```
-
 **Response:**
 ```json
 {
@@ -146,59 +135,30 @@ Analyzes a resume against a job description.
 }
 ```
 
-## Security Features
-
-- API keys are stored securely in environment variables
-- Client-side PDF processing (no files sent to servers)
+## Security
+- API keys are stored in environment variables
+- PDF parsing is done client-side for privacy
 - CORS-enabled API endpoints
 - Input validation and sanitization
-- Request timeout protection
-
-## Development
-
-### Available Scripts
-
-- `npm run dev` - Start frontend development server
-- `npm run dev:server` - Start backend server
-- `npm run dev:full` - Start both frontend and backend concurrently
-- `npm run build` - Build frontend for production
-- `npm run lint` - Run ESLint
-
-### Environment Variables
-
-- `GEMINI_API_KEY` - Your Google Gemini API key (required)
-- `VITE_API_URL` - Backend API URL (default: http://localhost:3001)
-- `PORT` - Backend server port (default: 3001)
-
-## Troubleshooting
-
-### Common Issues
-
-1. **"Unable to connect to the analysis service"**
-   - Make sure the backend server is running (`npm run dev:server`)
-   - Check that the `VITE_API_URL` in your `.env` file is correct
-
-2. **"AI service is not properly configured"**
-   - Verify your `GEMINI_API_KEY` is set in the `.env` file
-   - Make sure the API key is valid and has the necessary permissions
-
-3. **PDF parsing errors**
-   - Ensure the uploaded file is a valid PDF
-   - Try with a different PDF file
-   - Check browser console for detailed error messages
 
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Commit your changes (`git commit -m 'Add feature'`)
+4. Push to your branch (`git push origin feature/your-feature`)
 5. Open a Pull Request
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is open source under the [MIT License](LICENSE).
+
+## Author
+
+[Jeelan80](https://github.com/Jeelan80)  
+[LinkedIn](https://www.linkedin.com/in/jeelan80)  
+[WhatsApp – Click to Chat](https://wa.me/8197973038)
 
 ## Support
 
-If you encounter any issues or have questions, please open an issue on GitHub.
+If you have questions or issues, please open an issue on GitHub.

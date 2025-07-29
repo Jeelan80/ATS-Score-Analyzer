@@ -1,3 +1,8 @@
+/**
+ * ATS Resume Analyzer - Server API
+ * Author: GitHub Copilot (https://github.com/github/copilot)
+ * Project by Jeelan80 | https://github.com/Jeelan80
+ */
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -119,10 +124,45 @@ ${jobDescriptionText}
     }
 
 
-    // --- Robust, deterministic match score calculation (Jaccard similarity) ---
-    const norm = (arr) => Array.from(new Set((arr || []).map(s => s.trim().toLowerCase())));
-    const matching = norm(analysisData.keywordAnalysis.matchingKeywords);
-    const missing = norm(analysisData.keywordAnalysis.missingKeywords);
+
+    // --- Deterministic keyword extraction and matching ---
+    // Extract keywords from job description (simple split, can be improved)
+    function extractKeywords(text) {
+      // Split by comma, semicolon, or new line, and filter out short/common words
+      const stopwords = new Set([
+        'the','and','a','to','of','in','for','on','with','at','by','an','be','is','are','as','from','that','this','it','or','was','but','if','not','your','you','i','we','our','us','they','their','them','he','she','his','her','my','me','so','do','does','did','have','has','had','will','would','can','could','should','may','might','about','which','who','whom','been','were','than','then','there','here','when','where','how','what','why','all','any','each','other','some','such','no','nor','too','very','just','also','more','most','own','same','s','t','don','now'
+      ]);
+      return Array.from(new Set(
+        text
+          .toLowerCase()
+          .split(/[,;\n]/)
+          .map(s => s.trim())
+          .filter(s => s.length > 2 && !stopwords.has(s))
+      ));
+    }
+
+    // Deterministic matching
+    function getKeywordMatch(jobText, resumeText) {
+      const keywords = extractKeywords(jobText);
+      const resume = resumeText.toLowerCase();
+      const matching = [];
+      const missing = [];
+      keywords.forEach(kw => {
+        // Use word boundary for strict match
+        const regex = new RegExp(`\\b${kw.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")}\\b`, 'i');
+        if (regex.test(resume)) {
+          matching.push(kw);
+        } else {
+          missing.push(kw);
+        }
+      });
+      return { matching, missing };
+    }
+
+    // Use deterministic matching for keyword analysis
+    const { matching, missing } = getKeywordMatch(req.body.jobDescriptionText || '', req.body.resumeText || '');
+    analysisData.keywordAnalysis.matchingKeywords = matching;
+    analysisData.keywordAnalysis.missingKeywords = missing;
     const all = Array.from(new Set([...matching, ...missing]));
     let matchScore = 0;
     if (all.length > 0) {
@@ -186,8 +226,9 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`🚀 ATS Resume Analyzer API running on port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/health`);
-  console.log(`🔍 Analysis endpoint: http://localhost:${PORT}/api/analyze-resume`);
+const HOST = process.env.HOST || '0.0.0.0';
+app.listen(PORT, HOST, () => {
+  console.log(`🚀 ATS Resume Analyzer API running on http://${HOST}:${PORT}`);
+  console.log(`📊 Health check: http://${HOST}:${PORT}/health`);
+  console.log(`🔍 Analysis endpoint: http://${HOST}:${PORT}/api/analyze-resume`);
 });

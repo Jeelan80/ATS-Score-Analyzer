@@ -1,3 +1,11 @@
+/* Responsive inner container for Resume Keyword Cloud to avoid overflow and remove inline styles */
+.keyword-cloud-inner {
+  min-width: 320px;
+  max-width: 100%;
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+}
 /* Help tooltip styles for question mark icon */
 .help-tooltip-container {
   position: relative;
@@ -85,4 +93,16 @@
   writing-mode: vertical-rl;
   transform: rotate(180deg);
   letter-spacing: 2px;
+}
+
+/* Keyword Density Analysis row styles */
+.keyword-density-row {
+  min-width: 220px;
+}
+@media (min-width: 640px) {
+  .keyword-density-row {
+    min-width: 0;
+    flex-direction: row;
+    align-items: center;
+  }
 }

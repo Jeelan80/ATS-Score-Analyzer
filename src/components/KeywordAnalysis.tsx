@@ -11,10 +11,9 @@ export const KeywordAnalysis: React.FC<KeywordAnalysisProps> = ({
   missingKeywords,
 }) => {
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
-      <h3 className="text-xl font-bold text-gray-900 mb-6">Keyword Analysis</h3>
-      
-      <div className="grid md:grid-cols-2 gap-6">
+    <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
+      <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Keyword Analysis</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         {/* Matching Keywords */}
         <div>
           <div className="flex items-center space-x-2 mb-4">
@@ -24,7 +23,7 @@ export const KeywordAnalysis: React.FC<KeywordAnalysisProps> = ({
             </h4>
           </div>
           
-          <div className="space-y-2 max-h-48 overflow-y-auto">
+          <div className="space-y-2 max-h-32 sm:max-h-48 overflow-y-auto">
             {matchingKeywords.length > 0 ? (
               matchingKeywords.map((keyword, index) => (
                 <span
@@ -49,7 +48,7 @@ export const KeywordAnalysis: React.FC<KeywordAnalysisProps> = ({
             </h4>
           </div>
           
-          <div className="space-y-2 max-h-48 overflow-y-auto">
+          <div className="space-y-2 max-h-32 sm:max-h-48 overflow-y-auto">
             {missingKeywords.length > 0 ? (
               missingKeywords.map((keyword, index) => (
                 <span

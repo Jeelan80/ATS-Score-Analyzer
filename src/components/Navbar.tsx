@@ -15,7 +15,7 @@ export const Navbar: React.FC = () => (
       <span className="text-2xl font-bold text-gray-900 tracking-tight">ATS Resume Analyzer</span>
     </div>
     <a
-      href="https://github.com/"
+      href="https://github.com/Jeelan80/ATS-Score-Analyzer"
       target="_blank"
       rel="noopener noreferrer"
       className="flex items-center space-x-2 text-cyan-700 hover:text-cyan-900 font-medium group transition-colors duration-200"

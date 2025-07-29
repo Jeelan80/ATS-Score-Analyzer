@@ -1,4 +1,5 @@
 import React from 'react';
+import jsPDF from 'jspdf';
 import Card from './Card';
 import { HelpCircle } from 'lucide-react';
 import 'tippy.js/dist/tippy.css';
@@ -21,6 +22,147 @@ interface AdvancedStatsProps {
 }
 
 export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
+  // PDF download handler
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF();
+    let y = 10;
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const bottomMargin = 10;
+    const leftMargin = 10;
+    const maxWidth = 180;
+    // Helper to add section header with colored background
+    const addHeader = (text: string) => {
+      const headerHeight = 12;
+      if (y + headerHeight > pageHeight - bottomMargin) { doc.addPage(); y = 10; }
+      // Draw colored rectangle
+      doc.setFillColor(6, 182, 212); // cyan-600
+      doc.rect(leftMargin - 2, y - 2, maxWidth + 4, headerHeight, 'F');
+      doc.setFontSize(15);
+      doc.setTextColor(255,255,255);
+      doc.setFont('helvetica', 'bold');
+      doc.text(text, leftMargin, y + 7);
+      y += headerHeight + 10; // Increased spacing after header to prevent overlap
+      doc.setTextColor(0,0,0);
+      doc.setFont('helvetica', 'normal');
+    };
+    // Helper to add a horizontal line with extra spacing to prevent overlap
+    const addLine = () => {
+      doc.setLineWidth(0.5);
+      doc.setDrawColor(6, 182, 212); // cyan-600
+      doc.line(leftMargin, y, leftMargin + maxWidth, y);
+      y += 10;
+      doc.setDrawColor(0,0,0);
+    };
+    // Helper to add a block of text
+    const addBlock = (text: string, fontSize = 12, extraSpace = 4, color?: [number,number,number]) => {
+      doc.setFontSize(fontSize);
+      if (color) doc.setTextColor(...color);
+      const lines = doc.splitTextToSize(text, maxWidth);
+      if (y + lines.length * (fontSize + 1) > pageHeight - bottomMargin) { doc.addPage(); y = 10; }
+      doc.text(lines, leftMargin, y);
+      y += lines.length * (fontSize + 1) + extraSpace;
+      if (color) doc.setTextColor(0,0,0);
+    };
+    // Helper to add a bulleted list
+    const addList = (items: string[], indent = 6, fontSize = 12, color?: [number,number,number]) => {
+      doc.setFontSize(fontSize);
+      if (color) doc.setTextColor(...color);
+      items.forEach(item => {
+        if (y + fontSize + 2 > pageHeight - bottomMargin) { doc.addPage(); y = 10; }
+        doc.text(`• ${item}`, leftMargin + indent, y);
+        y += fontSize + 2;
+      });
+      if (color) doc.setTextColor(0,0,0);
+    };
+
+    // Title bar
+    doc.setFillColor(6, 182, 212); // cyan-600
+    doc.rect(0, 0, doc.internal.pageSize.getWidth(), 20, 'F');
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(255,255,255);
+    doc.text('ATS Resume Analysis Report', leftMargin, 14);
+    y = 28;
+    doc.setTextColor(0,0,0);
+    doc.setFont('helvetica', 'normal');
+    addLine();
+
+    // Skill Match
+    doc.setFillColor(6, 182, 212); // cyan-600
+    doc.rect(0, 0, doc.internal.pageSize.getWidth(), 20, 'F');
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(255,255,255);
+    doc.text('ATS Resume Analysis Report', leftMargin, 14);
+    y = 28;
+    doc.setTextColor(0,0,0);
+    doc.setFont('helvetica', 'normal');
+    addLine();
+
+    // Skill Match
+    addHeader('Skill Match');
+    addBlock(`Matched: ${results.keywordAnalysis.matchingKeywords.length} / ${results.keywordAnalysis.matchingKeywords.length + results.keywordAnalysis.missingKeywords.length}`, 13, 4, [6,182,212]);
+    addBlock(`Match Score: ${results.matchScore}%`, 13);
+    addBlock(`Summary: ${results.summary}`);
+    addLine();
+
+    // Extracted Info
+    if (Object.keys(results.extractedInfo).length > 0) {
+      addHeader('Extracted Info');
+      Object.entries(results.extractedInfo).forEach(([key, value]) => {
+        addBlock(`${key}: ${value}`);
+      });
+      addLine();
+    }
+
+    // Keyword Analysis
+    if (results.keywordAnalysis.matchingKeywords.length > 0 || results.keywordAnalysis.missingKeywords.length > 0) {
+      addHeader('Keyword Analysis');
+      if (results.keywordAnalysis.matchingKeywords.length > 0) {
+        addBlock('Matching Keywords:', 12, 2, [34,197,94]); // green-500
+        addList(results.keywordAnalysis.matchingKeywords, 10, 12, [34,197,94]);
+      }
+      if (results.keywordAnalysis.missingKeywords.length > 0) {
+        addBlock('Missing Keywords:', 12, 2, [239,68,68]); // red-500
+        addList(results.keywordAnalysis.missingKeywords, 10, 12, [239,68,68]);
+      }
+      addLine();
+    }
+
+    // Improvement Suggestions
+    addHeader('Improvement Suggestions');
+    addBlock(results.improvementFeedback, 12, 6);
+    addLine();
+
+    // Keyword Density
+    const escapeRegex = (str: string) => str.replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&');
+    const densityList = results.keywordAnalysis.matchingKeywords.concat(results.keywordAnalysis.missingKeywords).map((kw) => {
+      const regex = new RegExp(`\\b${escapeRegex(kw)}\\b`, 'gi');
+      const count = ((results.resumeText ?? '').match(regex) || []).length;
+      return `${kw}: ${count}`;
+    });
+    if (densityList.length > 0) {
+      addHeader('Keyword Density');
+      addList(densityList, 10, 12, [59,130,246]); // blue-500
+      addLine();
+    }
+
+    // Resume Section Coverage (placeholder)
+    addHeader('Resume Section Coverage');
+    addBlock('See app for details.', 12, 6, [100,116,139]); // slate-500
+    addLine();
+
+    // Footer with page number
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.setTextColor(100,116,139);
+      doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.getWidth() - 40, doc.internal.pageSize.getHeight() - 8);
+      doc.setTextColor(0,0,0);
+    }
+    doc.save('ATS_Resume_Analysis_Report.pdf');
+  };
   // For Skill Match Breakdown
   const totalRequired = results.keywordAnalysis.matchingKeywords.length + results.keywordAnalysis.missingKeywords.length;
   const matched = results.keywordAnalysis.matchingKeywords.length;
@@ -35,16 +177,24 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
 
   return (
     <>
+      <div className="flex justify-end mb-4">
+        <button
+          className="px-4 py-2 bg-cyan-600 text-white rounded shadow hover:bg-cyan-700 transition"
+          onClick={handleDownloadPDF}
+        >
+          Download Full Analysis as PDF
+        </button>
+      </div>
       <Card>
-        <h4 className="text-lg font-semibold mb-2 text-gray-800 flex items-center gap-2">
+        <h4 className="text-base sm:text-lg font-semibold mb-2 text-gray-800 flex items-center gap-2">
           Skill Match Breakdown
           <span className="help-tooltip-container">
             <HelpCircle className="help-icon" size={18} />
             <span className="help-tooltip-text">Shows what % of job-required skills are present in your resume.</span>
           </span>
         </h4>
-        <div className="flex items-center space-x-4">
-          <div className="w-32 h-32 flex items-center justify-center">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-4">
+          <div className="w-24 h-24 sm:w-32 sm:h-32 flex items-center justify-center mx-auto sm:mx-0">
             {/* Improved pie chart using SVG, not cut off */}
             <svg width="120" height="120" viewBox="0 0 120 120">
               <circle
@@ -68,18 +218,18 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
             </svg>
           </div>
           <div>
-            <div className="text-cyan-600 font-bold text-2xl">{matchedPercent}%</div>
-            <div className="text-gray-700">Matched Skills</div>
-            <div className="text-pink-500 font-bold text-lg mt-2">{missingPercent}%</div>
-            <div className="text-gray-700">Missing Skills</div>
+            <div className="text-cyan-600 font-bold text-xl sm:text-2xl">{matchedPercent}%</div>
+            <div className="text-gray-700 text-sm sm:text-base">Matched Skills</div>
+            <div className="text-pink-500 font-bold text-base sm:text-lg mt-2">{missingPercent}%</div>
+            <div className="text-gray-700 text-sm sm:text-base">Missing Skills</div>
             <div className="mt-2 text-xs text-gray-500">Total required: {totalRequired}</div>
           </div>
         </div>
       </Card>
 
       {/* Resume Keyword Cloud */}
-      <Card>
-        <h4 className="text-lg font-semibold mb-2 text-gray-800 flex items-center gap-2">
+      <Card className="hidden sm:block">
+        <h4 className="text-base sm:text-lg font-semibold mb-2 text-gray-800 flex items-center gap-2">
           Resume Keyword Cloud
           <span className="help-tooltip-container">
             <HelpCircle className="help-icon" size={18} />
@@ -87,7 +237,8 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
           </span>
         </h4>
         {/* Non-overlapping word cloud using measurement and placement */}
-        <div className="cloud-area-modern">
+        <div className="cloud-area-modern min-h-[60px] max-h-[120px] sm:min-h-[120px] sm:max-h-none overflow-y-auto p-2 sm:p-0 w-full overflow-x-auto">
+          <div className="keyword-cloud-inner">
           {/* Generate real keyword frequency data for the cloud */}
           {(() => {
             const stopwords = new Set([
@@ -105,13 +256,14 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
               .map(([text, value]) => ({ text, value }));
             return <KeywordCloudComponent words={wordArray} />;
           })()}
+          </div>
         </div>
         <div className="mt-2 text-xs text-gray-500">Larger words = more frequent in your resume (common words excluded). Cloud is randomized for visual effect.</div>
       </Card>
 
       {/* Resume Readability & Length Analysis */}
       <Card>
-        <h4 className="text-lg font-semibold mb-2 text-gray-800">Resume Readability & Length Analysis</h4>
+        <h4 className="text-base sm:text-lg font-semibold mb-2 text-gray-800">Resume Readability & Length Analysis</h4>
         {(() => {
           const text = (results.resumeText ?? '').replace(/\s+/g, ' ').trim();
           const wordCount = text ? text.split(' ').length : 0;
@@ -131,7 +283,7 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
           else readabilityColor = 'green';
           const getColor = (color: ColorType) => color === 'green' ? '#22c55e' : color === 'yellow' ? '#eab308' : '#ef4444';
           return (
-            <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
+            <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-center justify-between w-full">
               <div className="flex flex-col gap-4 items-center md:items-start">
                 <StatHero icon="📄" value={wordCount} label="Word count" colorClass="blue" />
                 <StatHero icon="⏱️" value={`${readingTime} min`} label="Estimated reading time" colorClass="blue" />
@@ -156,7 +308,7 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
 
       {/* Buzzword & Filler Word Detector */}
       <Card className="buzzword-section">
-        <h4 className="text-lg font-semibold mb-2 text-gray-800">Buzzword & Filler Word Detector</h4>
+        <h4 className="text-base sm:text-lg font-semibold mb-2 text-gray-800">Buzzword & Filler Word Detector</h4>
         <div className="buzzword-label">Buzzwords:</div>
         <div className="mb-4">
           {['hardworking','synergy','dynamic','go-getter','results-driven','innovative','passionate','motivated','strategic','proactive','detail-oriented','self-starter','team player','fast learner','visionary','guru','rockstar','ninja','thought leader','disruptive'].map(word => {
@@ -194,9 +346,9 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
 
       {/* Soft Skills & Action Verbs Detection */}
       <Card className="softskills-section">
-        <h4 className="text-lg font-semibold mb-2 text-gray-800">Soft Skills & Action Verbs Detection</h4>
+        <h4 className="text-base sm:text-lg font-semibold mb-2 text-gray-800">Soft Skills & Action Verbs Detection</h4>
         <div className="softskills-label">Soft Skills:</div>
-        <div className="mb-4">
+        <div className="mb-2 sm:mb-4 flex flex-wrap gap-2">
           {['teamwork','leadership','communication','problem solving','adaptability','creativity','time management','collaboration','initiative','critical thinking','organization','flexibility','work ethic','attention to detail','empathy'].map(skill => {
             const present = (results.resumeText ?? '').toLowerCase().includes(skill);
             return (
@@ -205,7 +357,7 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
           })}
         </div>
         <div className="softskills-label">Action Verbs:</div>
-        <div>
+        <div className="flex flex-wrap gap-2">
           {['led','managed','developed','designed','implemented','created','improved','achieved','coordinated','analyzed','built','launched','initiated','delivered','organized','increased','reduced','solved','mentored','presented','negotiated','researched','supported','trained','streamlined','executed'].map(verb => {
             const present = (results.resumeText ?? '').toLowerCase().includes(verb);
             return (
@@ -219,12 +371,12 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
       {/* Top Missing Keywords Suggestions */}
       {results.keywordAnalysis.missingKeywords.length > 0 && (
         <Card className="missing-keywords-section">
-          <h4>Top Missing Keywords Suggestions</h4>
-          <ul className="missing-keywords-list">
+          <h4 className="text-base sm:text-lg font-semibold mb-2 text-gray-800">Top Missing Keywords Suggestions</h4>
+          <ul className="missing-keywords-list flex flex-col gap-2">
             {results.keywordAnalysis.missingKeywords.slice(0, 5).map((keyword) => (
-              <li key={keyword} className="missing-keyword-card">
-                <span className="missing-keyword-badge">{keyword}</span>
-                <span className="missing-keyword-desc">Try to naturally include this keyword in your resume, e.g., in your skills, experience, or summary section.</span>
+              <li key={keyword} className="missing-keyword-card flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-3">
+                <span className="missing-keyword-badge text-xs sm:text-sm">{keyword}</span>
+                <span className="missing-keyword-desc text-xs sm:text-sm">Try to naturally include this keyword in your resume, e.g., in your skills, experience, or summary section.</span>
               </li>
             ))}
           </ul>
@@ -234,23 +386,23 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
 
       {/* Keyword Density Analysis */}
       <Card>
-        <h4 className="text-lg font-semibold mb-2 text-gray-800 flex items-center gap-2">
+        <h4 className="text-base sm:text-lg font-semibold mb-2 text-gray-800 flex items-center gap-2">
           Keyword Density Analysis
           <span className="help-tooltip-container">
             <HelpCircle className="help-icon" size={18} />
             <span className="help-tooltip-text">Shows how often each keyword appears in your resume.</span>
           </span>
         </h4>
-        <div className="space-y-2">
+        <div className="space-y-2 w-full sm:overflow-x-visible overflow-x-auto">
           {results.keywordAnalysis.matchingKeywords.concat(results.keywordAnalysis.missingKeywords).map((keyword) => {
             // Count occurrences in resumeText (case-insensitive)
             const regex = new RegExp(`\\b${keyword.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&") }\\b`, 'gi');
             const count = ((results.resumeText ?? '').match(regex) || []).length;
             const isMissing = results.keywordAnalysis.missingKeywords.includes(keyword);
             return (
-              <div key={keyword} className="flex items-center">
-                <span className={`w-32 text-sm ${isMissing ? 'text-pink-500' : 'text-cyan-700'} font-medium`}>{keyword}</span>
-                <div className="flex-1 mx-2 bg-gray-200 rounded h-4 relative">
+              <div key={keyword} className="keyword-density-row flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
+                <span className={`w-28 xs:w-32 text-xs sm:text-sm ${isMissing ? 'text-pink-500' : 'text-cyan-700'} font-medium`}>{keyword}</span>
+                <div className="flex-1 mx-0 xs:mx-2 bg-gray-200 rounded h-4 relative min-w-[60px]">
                   {(() => {
                     // Map count to width class (max 5+)
                     const widthClass = count >= 5
@@ -281,7 +433,7 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
 
       {/* Keyword Coverage Heatmap */}
       <Card>
-        <h4 className="text-lg font-semibold mb-2 text-gray-800 flex items-center gap-2">
+        <h4 className="text-base sm:text-lg font-semibold mb-2 text-gray-800 flex items-center gap-2">
           Keyword Coverage Heatmap
           <span className="help-tooltip-container">
             <HelpCircle className="help-icon" size={18} />
@@ -295,7 +447,7 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
       </Card>
       {/* Resume Section Coverage */}
       <Card>
-        <h4 className="text-lg font-semibold mb-2 text-gray-800 flex items-center gap-2">
+        <h4 className="text-base sm:text-lg font-semibold mb-2 text-gray-800 flex items-center gap-2">
           Resume Section Coverage
           <span className="help-tooltip-container">
             <HelpCircle className="help-icon" size={18} />

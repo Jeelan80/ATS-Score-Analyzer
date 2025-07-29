@@ -15,6 +15,7 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({
   disabled = false,
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -31,36 +32,49 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
-    
     if (disabled) return;
-
     const files = Array.from(e.dataTransfer.files);
     const pdfFile = files.find(file => file.type === 'application/pdf');
-    
     if (pdfFile) {
+      if (pdfFile.size > 10 * 1024 * 1024) {
+        setError('PDF file size must be 10MB or less.');
+        return;
+      }
+      setError(null);
       onFileSelect(pdfFile);
     }
   }, [onFileSelect, disabled]);
 
   const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && file.type === 'application/pdf') {
-      onFileSelect(file);
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        setError('PDF file size must be 10MB or less.');
+        e.target.value = '';
+        return;
+      }
+      if (file.type === 'application/pdf') {
+        setError(null);
+        onFileSelect(file);
+      }
     }
     e.target.value = '';
   }, [onFileSelect]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 min-w-0 break-words">
       <label className="block text-sm font-medium text-gray-700 mb-2">
         Resume Upload
       </label>
       
+      {error && (
+        <div className="text-xs text-red-600 font-semibold mb-2">{error}</div>
+      )}
       {selectedFile ? (
-        <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
-          <div className="flex items-center space-x-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 bg-green-50 border border-green-200 rounded-lg min-w-0 break-words">
+          <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 break-words">
             <FileText className="h-5 w-5 text-green-600" />
-            <span className="text-sm font-medium text-green-800">
+            <span className="text-xs sm:text-sm font-medium text-green-800 break-words">
               {selectedFile.name}
             </span>
           </div>

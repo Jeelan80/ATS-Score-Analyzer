@@ -15,15 +15,15 @@ export const Header: React.FC = () => {
             </h1>
           </div>
           
-          <a
-            href="https://github.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
-          >
-            <Github className="h-5 w-5" />
-            <span className="hidden sm:inline">Open Source</span>
-          </a>
+              <a
+                href="https://github.com/Jeelan80/ATS-Score-Analyzer"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
+              >
+                <Github className="h-5 w-5" />
+                <span className="hidden sm:inline">Open Source</span>
+              </a>
         </div>
       </div>
     </header>

@@ -20,20 +20,23 @@ export const InputSection: React.FC<InputSectionProps> = ({
   disabled = false,
 }) => {
   return (
-    <div className="bg-white rounded-xl shadow-lg p-8 space-y-8">
-      <div className="grid lg:grid-cols-2 gap-8">
-        <ResumeUploader
-          selectedFile={selectedFile}
-          onFileSelect={onFileSelect}
-          onClearFile={onClearFile}
-          disabled={disabled}
-        />
-        
-        <JobDescriptionInput
-          value={jobDescription}
-          onChange={onJobDescriptionChange}
-          disabled={disabled}
-        />
+    <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
+        <div className="min-w-0 break-words">
+          <ResumeUploader
+            selectedFile={selectedFile}
+            onFileSelect={onFileSelect}
+            onClearFile={onClearFile}
+            disabled={disabled}
+          />
+        </div>
+        <div className="min-w-0 break-words">
+          <JobDescriptionInput
+            value={jobDescription}
+            onChange={onJobDescriptionChange}
+            disabled={disabled}
+          />
+        </div>
       </div>
     </div>
   );

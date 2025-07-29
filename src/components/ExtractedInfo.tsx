@@ -23,32 +23,30 @@ export const ExtractedInfo: React.FC<ExtractedInfoProps> = ({ extractedInfo }) =
   const showGithub = extractedInfo.github && extractedInfo.github !== 'Not found';
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
-      <h3 className="text-xl font-bold text-gray-900 mb-6">Extracted Information</h3>
-      
-      <div className="space-y-4">
+    <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
+      <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Extracted Information</h3>
+      <div className="space-y-3 sm:space-y-4">
         {infoItems.map(({ icon: Icon, label, value }) => (
-          <div key={label} className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+          <div key={label} className="flex items-center space-x-3 sm:space-x-4 p-2 sm:p-3 bg-gray-50 rounded-lg">
             <div className="flex-shrink-0">
               <Icon className="h-5 w-5 text-gray-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-700">{label}</p>
-              <p className="text-sm text-gray-900 truncate">
+              <p className="text-xs sm:text-sm font-medium text-gray-700">{label}</p>
+              <p className="text-xs sm:text-sm text-gray-900 truncate">
                 {value || 'Not found'}
               </p>
             </div>
           </div>
         ))}
         {showGithub && (
-          <div className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center space-x-3 sm:space-x-4 p-2 sm:p-3 bg-gray-50 rounded-lg">
             <div className="flex-shrink-0">
-              {/* You can use a GitHub icon here if you have one, or just text */}
               <span className="h-5 w-5 text-gray-600">🐙</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-700">GitHub</p>
-              <p className="text-sm text-green-600">Found</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-700">GitHub</p>
+              <p className="text-xs sm:text-green-600">Found</p>
             </div>
           </div>
         )}
