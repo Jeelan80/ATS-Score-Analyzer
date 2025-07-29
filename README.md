@@ -43,13 +43,7 @@ ATS Resume Analyzer is a modern, open-source web application that helps you opti
    ```bash
    npm install
    ```
-3. **Set up environment variables:**
-   - Copy `.env.example` to `.env` and fill in your Gemini API key:
-     ```env
-     GEMINI_API_KEY=your_actual_gemini_api_key_here
-     VITE_API_URL = your_system_ip_address:3001
-     PORT=3001
-     ```
+3. **Set up env variables with gemini api**
 4. **Start the application:**
    ```bash
    npm run dev:full
