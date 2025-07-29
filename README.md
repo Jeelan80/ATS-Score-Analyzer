@@ -47,7 +47,7 @@ ATS Resume Analyzer is a modern, open-source web application that helps you opti
    - Copy `.env.example` to `.env` and fill in your Gemini API key:
      ```env
      GEMINI_API_KEY=your_actual_gemini_api_key_here
-     VITE_API_URL=http://localhost:3001
+     VITE_API_URL = your_system_ip_address:3001
      PORT=3001
      ```
 4. **Start the application:**
@@ -71,6 +71,22 @@ The app will be available at:
 3. **Analyze**: Click "Analyze Resume" to get your match score, keyword analysis, and suggestions.
 4. **Review Results**: See your compatibility score, extracted info, keyword matches, and improvement tips.
 5. **Start Over**: Use "Start New Analysis" to try again with a different resume or job description.
+
+## Recent Updates
+
+- **Deterministic ATS Score Calculation**: The backend now uses a robust, deterministic algorithm to extract keywords from the job description and match them against the resume. This ensures the ATS match score is always accurate and does not fluctuate due to AI inconsistencies.
+- **PDF Download Improvements**: The PDF report generation now handles keywords with special characters correctly, preventing errors and ensuring all analysis sections are included.
+- **.env Example**: See below for a sample .env configuration.
+
+## .env Example
+
+Copy `.env.example` to `.env` and fill in your values:
+
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+VITE_API_URL=http://localhost:3001
+PORT=3001
+```
 
 ## Project Structure
 
