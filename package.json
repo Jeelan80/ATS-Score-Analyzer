@@ -23,6 +23,7 @@
     "express": "^4.21.1",
     "jspdf": "^3.0.1",
     "lucide-react": "^0.344.0",
+    "nodemailer": "^7.0.5",
     "pdfjs-dist": "^5.3.93",
     "react": "^18.3.1",
     "react-circular-progressbar": "^2.2.0",

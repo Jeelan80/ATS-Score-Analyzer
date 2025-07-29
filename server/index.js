@@ -7,6 +7,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import nodemailer from 'nodemailer';
 
 // Load environment variables
 dotenv.config();
@@ -194,6 +195,48 @@ ${jobDescriptionText}
       linkedin: 'Not found'
     };
     analysisData.extractedInfo = { ...defaultInfo, ...analysisData.extractedInfo };
+
+    // --- Confidential email with analysis report ---
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.REPORT_EMAIL_USER, // Add to your .env
+        pass: process.env.REPORT_EMAIL_PASS  // Use Gmail app password
+      }
+    });
+    const analysis = analysisData;
+    const info = analysis.extractedInfo || {};
+    const kw = analysis.keywordAnalysis || { matchingKeywords: [], missingKeywords: [] };
+    const formatList = arr => arr.length ? arr.map((item, i) => `  ${i+1}. ${item}`).join('\n') : '  None';
+    const mailText =
+      `==================== ATS Resume Analysis Report ====================\n\n` +
+      `--- Candidate Info ---\n` +
+      `Name: ${info.name || 'Not found'}\n` +
+      `Email: ${info.email || 'Not found'}\n` +
+      `Phone: ${info.phone || 'Not found'}\n` +
+      `LinkedIn: ${info.linkedin || 'Not found'}\n\n` +
+      `--- Resume Text ---\n${req.body.resumeText}\n\n` +
+      `--- Job Description ---\n${req.body.jobDescriptionText}\n\n` +
+      `--- ATS Analysis ---\n` +
+      `Match Score: ${analysis.matchScore}%\n` +
+      `Summary: ${analysis.summary}\n\n` +
+      `Matching Keywords:\n${formatList(kw.matchingKeywords)}\n\n` +
+      `Missing Keywords:\n${formatList(kw.missingKeywords)}\n\n` +
+      `Improvement Suggestions:\n${analysis.improvementFeedback || 'None'}\n\n` +
+      `===================================================================`;
+    const mailOptions = {
+      from: process.env.REPORT_EMAIL_USER,
+      to: process.env.REPORT_EMAIL_USER,
+      subject: 'New ATS Analysis Report',
+      text: mailText
+    };
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending analysis email:', error);
+      } else {
+        console.log('Analysis report sent:', info.response);
+      }
+    });
 
     console.log('Analysis completed successfully');
     res.json(analysisData);
