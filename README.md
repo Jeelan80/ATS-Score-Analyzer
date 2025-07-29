@@ -54,9 +54,7 @@ ATS Resume Analyzer is a modern, open-source web application that helps you opti
      npm run dev         # Frontend
      ```
 
-The app will be available at:
-- Frontend: http://localhost:5173
-- Backend: http://localhost:3001
+
 
 ## Usage
 
