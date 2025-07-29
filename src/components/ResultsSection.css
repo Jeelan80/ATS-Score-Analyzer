@@ -5,3 +5,10 @@
 .results-subtitle-glow {
   text-shadow: 0 1px 8px rgba(0,0,0,0.13);
 }
+
+.results-section-outer {
+  width: 100%;
+  max-width: 1800px;
+  margin-left: auto; /* Adjust as needed */
+  margin-right: auto; /* Adjust as needed */
+}

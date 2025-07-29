@@ -1,0 +1,45 @@
+/* Resume Keyword Cloud Section Styles */
+.resume-keyword-cloud-section {
+  width: 100%;
+  max-width: 100px;
+  min-height: 460px;
+  height: auto;
+  margin: 0 auto 2rem auto;
+  background: linear-gradient(120deg, #f8fafc 60%, #e0e7ef 100%);
+  border-radius: 2.5rem;
+  box-shadow:
+    0 4px 24px 0 rgba(59,130,246,0.10),
+    0 1.5px 6px 0 rgba(16,185,129,0.08),
+    0 0.5px 1.5px 0 rgba(0,0,0,0.04);
+  padding: 2rem 2rem 1.5rem 2rem;
+  border: 1.5px solid #e0e7ef;
+  position: relative;
+  overflow-x: auto;
+  overflow-y: visible;
+  transition: box-shadow 0.18s, transform 0.18s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.resume-keyword-cloud-section .wordcloud-canvas {
+  width: 100% !important;
+  max-width: 1200px;
+  height: 600px !important;
+  object-fit: contain;
+  border-radius: 1.5rem;
+  background: #111;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 600px) {
+  .resume-keyword-cloud-section {
+    width: 80% !important;
+    max-width: 900px;
+    padding: 1rem;
+    border-radius: 1.2rem;
+  }
+  .resume-keyword-cloud-section .wordcloud-canvas {
+    height: 600px !important;
+  }
+}

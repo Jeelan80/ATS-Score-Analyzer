@@ -1,0 +1,86 @@
+.wordCloudRect {
+  cursor: pointer;
+}
+.wordCloudTooltip {
+  position: absolute;
+  background: rgba(30,30,30,0.95);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  pointer-events: none;
+  font-size: 15px;
+  z-index: 9999;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  white-space: nowrap;
+  left: var(--tooltip-left, 0px); 
+  top: var(--tooltip-top, 0px); 
+}
+.wordCloudTooltip[data-left][data-top] {
+  left: attr(data-left px);
+  top: attr(data-top px);
+}
+.wordCloudTooltip[data-tooltip-left][data-tooltip-top] {
+  --tooltip-left: attr(data-tooltip-left px);
+  --tooltip-top: attr(data-tooltip-top px);
+}
+.wordCloudContainer {
+  position: relative;
+  width: var(--cloud-width, 700px);
+  height: var(--cloud-height, 400px);
+  background: #000;
+  overflow: hidden;
+  border-radius: 18px;
+  box-shadow: 0 4px 32px #000a;
+}
+
+.heroWordWrapper {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 10;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+  width: 90vw;
+  max-width: 95%;
+}
+
+.heroWord {
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  font-size: clamp(2.5rem, 8vw, 5.5rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  background: linear-gradient(120deg, #2196f3 0%, #42a5f5 40%, #90caf9 80%, #e3f2fd 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  /* Removed: text-fill-color: transparent; */
+  /* Make the effect more subtle: */
+  filter: none;
+  text-shadow:
+    0 2px 8px #1565c0,
+    0 1px 0 #fff8;
+  border-radius: 18px;
+  padding: 0.1em 0.4em;
+  /* Removed: box-shadow */
+  /* Glossy overlay */
+  position: relative;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  text-align: center;
+}
+
+.heroWord::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 10%;
+  top: 10%;
+  width: 80%;
+  height: 30%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.12) 100%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2;
+} 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import WordCloud from 'react-wordcloud';
+import WordCloud from 'react-d3-cloud';
 import 'tippy.js/dist/tippy.css'; // Optional: for tooltips
 import 'tippy.js/animations/scale.css'; // Optional: for tooltips
 
@@ -69,7 +69,7 @@ const KeywordCloudComponent: React.FC<KeywordCloudComponentProps> = ({ words: pr
   }, []);
   return (
     <div className="keyword-cloud-bg">
-      <WordCloud key={cloudKey} words={displayWords} options={options} />
+      <WordCloud key={cloudKey} data={displayWords} {...options} />
     </div>
   );
 };

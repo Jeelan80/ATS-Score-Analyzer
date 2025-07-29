@@ -27,8 +27,8 @@
     "pdfjs-dist": "^5.3.93",
     "react": "^18.3.1",
     "react-circular-progressbar": "^2.2.0",
+    "react-d3-cloud": "^1.0.6",
     "react-dom": "^18.3.1",
-    "react-wordcloud": "^1.2.7",
     "tippy.js": "^6.3.7"
   },
   "devDependencies": {

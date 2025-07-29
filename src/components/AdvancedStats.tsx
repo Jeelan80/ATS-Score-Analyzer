@@ -1,3 +1,4 @@
+import './ResumeKeywordCloudSection.css';
 import React from 'react';
 import jsPDF from 'jspdf';
 import Card from './Card';
@@ -6,7 +7,7 @@ import 'tippy.js/dist/tippy.css';
 import './BuzzwordGlow.css';
 import Gauge from './Gauge';
 import StatHero from './StatHero';
-import KeywordCloudComponent from './KeywordCloud';
+import HeroWordCloud, { CloudWord } from './HeroWordCloud';
 import { AnalysisResult } from '../types';
 import './AdvancedStats.css';
 import './BuzzwordSection.css';
@@ -228,7 +229,7 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
       </Card>
 
       {/* Resume Keyword Cloud */}
-      <Card className="hidden sm:block">
+      <Card className="resume-keyword-cloud-section hidden sm:block">
         <h4 className="text-base sm:text-lg font-semibold mb-2 text-gray-800 flex items-center gap-2">
           Resume Keyword Cloud
           <span className="help-tooltip-container">
@@ -236,26 +237,30 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = ({ results }) => {
             <span className="help-tooltip-text">Visualizes the most frequent keywords in your resume. Bigger = more frequent.</span>
           </span>
         </h4>
-        {/* Non-overlapping word cloud using measurement and placement */}
         <div className="cloud-area-modern min-h-[60px] max-h-[120px] sm:min-h-[120px] sm:max-h-none overflow-y-auto p-2 sm:p-0 w-full overflow-x-auto">
           <div className="keyword-cloud-inner">
-          {/* Generate real keyword frequency data for the cloud */}
-          {(() => {
-            const stopwords = new Set([
-              'the','and','a','to','of','in','for','on','with','at','by','an','be','is','are','as','from','that','this','it','or','was','but','if','not','your','you','i','we','our','us','they','their','them','he','she','his','her','my','me','so','do','does','did','have','has','had','will','would','can','could','should','may','might','about','which','who','whom','been','were','than','then','there','here','when','where','how','what','why','all','any','each','other','some','such','no','nor','too','very','just','also','more','most','own','same','s','t','don','now'
-            ]);
-            const text = (results.resumeText ?? '').toLowerCase();
-            const words = text.match(/\b[a-z]{3,}\b/g) || [];
-            const freq: Record<string, number> = {};
-            words.forEach(word => {
-              if (!stopwords.has(word)) freq[word] = (freq[word] || 0) + 1;
-            });
-            const wordArray = Object.entries(freq)
-              .sort((a, b) => b[1] - a[1])
-              .slice(0, 40)
-              .map(([text, value]) => ({ text, value }));
-            return <KeywordCloudComponent words={wordArray} />;
-          })()}
+            {(() => {
+              const stopwords = new Set([
+                'the','and','a','to','of','in','for','on','with','at','by','an','be','is','are','as','from','that','this','it','or','was','but','if','not','your','you','i','we','our','us','they','their','them','he','she','his','her','my','me','so','do','does','did','have','has','had','will','would','can','could','should','may','might','about','which','who','whom','been','were','than','then','there','here','when','where','how','what','why','all','any','each','other','some','such','no','nor','too','very','just','also','more','most','own','same','s','t','don','now'
+              ]);
+              const text = (results.resumeText ?? '').toLowerCase();
+              const words = text.match(/\b[a-z]{3,}\b/g) || [];
+              const freq: Record<string, number> = {};
+              words.forEach(word => {
+                if (!stopwords.has(word)) freq[word] = (freq[word] || 0) + 1;
+              });
+              const wordArray = Object.entries(freq)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 40)
+                .map(([text, value]) => ({ text, value }));
+              if (wordArray.length === 0) {
+                return <div className="text-gray-500 text-sm">No significant keywords found.</div>;
+              }
+              const [heroWord, ...cloudWords] = wordArray;
+              return (
+                <HeroWordCloud heroWord={heroWord.text} cloudWords={cloudWords as CloudWord[]} />
+              );
+            })()}
           </div>
         </div>
         <div className="mt-2 text-xs text-gray-500">Larger words = more frequent in your resume (common words excluded). Cloud is randomized for visual effect.</div>

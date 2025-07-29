@@ -27,7 +27,7 @@ app.get('/health', (req, res) => {
 // Resume analysis endpoint
 app.post('/api/analyze-resume', async (req, res) => {
   try {
-    const { resumeText, jobDescriptionText } = req.body;
+    const { resumeText, jobDescriptionText, extractedLinkedin, extractedGithub, extractedEmail } = req.body;
 
     // Validate input
     if (!resumeText?.trim() || !jobDescriptionText?.trim()) {
@@ -49,46 +49,10 @@ app.post('/api/analyze-resume', async (req, res) => {
     // Use a supported Gemini model name
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
 
-    // Construct the prompt with explicit LinkedIn/email extraction instructions
-    const prompt = `You are an expert AI-powered Applicant Tracking System (ATS). Your task is to analyze a resume against a job description. Provide your output ONLY in a valid JSON format. Do not include any introductory text or markdown formatting.
+    // --- Enhanced Gemini Prompt for Professional ATS Analysis ---
+    const prompt = `You are a highly sophisticated, industry-leading Applicant Tracking System (ATS) model, designed by top recruitment specialists. Your analysis goes far beyond simple keyword matching. You must evaluate a candidate's resume against a job description by understanding context, inferring proficiency, and weighting skills based on their relevance.\n\nYour final output MUST be a single, valid JSON object and nothing else. Do not include any text before or after the JSON.\n\nThe JSON object must have the following top-level structure: { \"matchScore\": ..., \"summary\": ..., \"extractedInfo\": ..., \"keywordAnalysis\": ..., \"improvementFeedback\": ... }\n\nHere is the detailed logic you must follow to generate the value for each key:\n\n1. matchScore (Number):\nCalculate this score as a weighted average of the following factors. Do not simply guess.\n\nHard Skills Match (60% weight): How many of the required technical skills, tools, and platforms from the job description are present in the resume?\n\nExperience Relevance (30% weight): Does the candidate's project or work experience (e.g., IoT, Healthcare Chatbot) align with the role described in the job description? Analyze the substance of the projects, not just their titles.\n\nEducation & Certifications (10% weight): Does the candidate's educational background and certifications (like Ideathon Winner) align with the role?\n\n2. summary (String):\nProvide a concise, professional one-sentence summary of the candidate's fit. Example: \"A strong candidate with excellent alignment on core Python skills, but lacks the specified professional cloud and database experience.\"\n\n3. extractedInfo (Object):\nExtract the candidate's contact information as specified: { \"name\": \"...\", \"email\": \"...\", \"phone\": \"...\", \"linkedin\": \"...\" }.\n\n4. keywordAnalysis (Object):\nThis is the most critical section. Structure your analysis into the following nested objects. This provides a much deeper analysis than a simple list.\n\nhardSkills: An object containing two arrays:\nmatched: A list of essential technical skills (languages, frameworks, tools, platforms) mentioned in both the job description and the resume.\nmissing: A list of essential technical skills required by the job description but not found in the resume.\n\nsoftSkills: An object containing two arrays:\nmatched: A list of soft skills (e.g., \"Team Player\", \"Problem-Solving\", \"Communication\") found in both documents.\nmissing: A list of soft skills mentioned in the job description but not found in the resume.\n\nsemanticMatches: An array of objects demonstrating your contextual understanding. Identify concepts in the job description and find evidence in the resume, even if the exact words are not used. The format should be { \"jdRequirement\": \"...\", \"resumeEvidence\": \"...\" }.\n\nExample: { \"jdRequirement\": \"Experience with data visualization\", \"resumeEvidence\": \"Designed a web application to display user statistics and provide actionable insights.\" }\n\nproficiencyInference: An array of objects where you infer the candidate's proficiency level in key skills based on the language used in the resume. Use levels like \"Expert\", \"Proficient\", or \"Familiar\".\n\nExample: { \"skill\": \"IoT Development\", \"level\": \"Proficient\", \"evidence\": \"PROJECT LEAD... Developed an IoT-based solution\" }\n\n5. improvementFeedback (String):\nProvide a multi-point, actionable paragraph of feedback for the candidate. The advice should be specific and directly related to the missing skills and gaps identified in the analysis. Example: \"To better align with this role, consider: 1. Gaining hands-on experience with a major cloud platform like AWS or GCP. 2. Highlighting any SQL or NoSQL database experience, as this was a key requirement. 3. Quantifying achievements in your projects with metrics...\"\n\nResume Text:\n\n${resumeText}\nJob Description Text:\n\n${jobDescriptionText}`;
 
-The JSON object must have the following structure:
-{
-  "matchScore": <A number between 0 and 100 representing the match percentage>,
-  "summary": "<A one-sentence summary like 'Strong Match' or 'Good Candidate'>",
-  "extractedInfo": {
-    "name": "<Candidate's full name>",
-    "email": "<Candidate's email address>",
-    "phone": "<Candidate's phone number>",
-    "linkedin": "<Candidate's LinkedIn profile URL, if available>"
-  },
-  "keywordAnalysis": {
-    "matchingKeywords": ["<list of skills found in both resume and JD>"],
-    "missingKeywords": ["<list of important skills from JD not found in resume>"]
-  },
-  "improvementFeedback": "<A paragraph of constructive feedback on how the candidate could improve their resume to better match this specific job description.>"
-}
-
-If you find LinkedIn URLs or emails that are split across lines or contain extra spaces, reconstruct them accurately. If a LinkedIn or email is provided below (from PDF extraction), use it as the primary value unless you find a better one in the text.
-
-
-Extracted from PDF (if available):
-LinkedIn: ${req.body.extractedLinkedin || 'N/A'}
-GitHub: ${req.body.extractedGithub || 'N/A'}
-Email: ${req.body.extractedEmail || 'N/A'}
-
-Here is the resume text:
----
-${resumeText}
----
-
-Here is the job description text:
----
-${jobDescriptionText}
----`;
-
-    console.log('Making request to Gemini API...');
-    
+    console.log('Making request to Gemini API with enhanced ATS prompt...');
     // Make the API call with timeout
     const result = await Promise.race([
       model.generateContent(prompt),
@@ -116,20 +80,28 @@ ${jobDescriptionText}
       });
     }
 
-    // Validate the response structure
-    if (!analysisData.matchScore || !analysisData.summary || !analysisData.extractedInfo) {
-      console.error('Invalid response structure:', analysisData);
+    // Validate the response structure (top-level keys)
+    const requiredKeys = ['matchScore', 'summary', 'extractedInfo', 'keywordAnalysis', 'improvementFeedback'];
+    const missingKeys = requiredKeys.filter(key => !(key in analysisData));
+    if (missingKeys.length > 0) {
+      console.error('Invalid response structure, missing keys:', missingKeys);
       return res.status(500).json({ 
         message: 'Invalid response format from AI service. Please try again.' 
       });
     }
 
-
+    // Optionally, patch in extractedLinkedin, extractedGithub, extractedEmail if Gemini missed them
+    if (extractedLinkedin && (!analysisData.extractedInfo.linkedin || analysisData.extractedInfo.linkedin === 'N/A')) {
+      analysisData.extractedInfo.linkedin = extractedLinkedin;
+    }
+    if (extractedEmail && (!analysisData.extractedInfo.email || analysisData.extractedInfo.email === 'N/A')) {
+      analysisData.extractedInfo.email = extractedEmail;
+    }
+    // (Github is not in the required structure, but you could add it if needed)
 
     // --- Deterministic keyword extraction and matching ---
-    // Extract keywords from job description (simple split, can be improved)
+    // Extract keywords from job description (split by comma, semicolon, or new line, filter out stopwords)
     function extractKeywords(text) {
-      // Split by comma, semicolon, or new line, and filter out short/common words
       const stopwords = new Set([
         'the','and','a','to','of','in','for','on','with','at','by','an','be','is','are','as','from','that','this','it','or','was','but','if','not','your','you','i','we','our','us','they','their','them','he','she','his','her','my','me','so','do','does','did','have','has','had','will','would','can','could','should','may','might','about','which','who','whom','been','were','than','then','there','here','when','where','how','what','why','all','any','each','other','some','such','no','nor','too','very','just','also','more','most','own','same','s','t','don','now'
       ]);
@@ -145,13 +117,19 @@ ${jobDescriptionText}
     // Deterministic matching
     function getKeywordMatch(jobText, resumeText) {
       const keywords = extractKeywords(jobText);
-      const resume = resumeText.toLowerCase();
+      // Normalize resume text: lowercase, replace punctuation with spaces, collapse whitespace
+      // Normalize resume: lowercase, collapse whitespace, but keep special chars for keywords like C++
+      let resumeNorm = resumeText.toLowerCase().replace(/\s+/g, ' ').trim();
       const matching = [];
       const missing = [];
       keywords.forEach(kw => {
-        // Use word boundary for strict match
-        const regex = new RegExp(`\\b${kw.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")}\\b`, 'i');
-        if (regex.test(resume)) {
+        // Normalize keyword: lowercase, collapse whitespace
+        let normKw = kw.toLowerCase().replace(/\s+/g, ' ').trim();
+        // Escape regex special chars in keyword (so c++ matches literally)
+        const pattern = normKw.split(' ').map(w => w.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")).join('\\s+');
+        // Match keyword as a whole word or phrase, case-insensitive
+        const regex = new RegExp(`(^|[^a-z0-9])${pattern}([^a-z0-9]|$)`, 'i');
+        if (regex.test(resumeNorm)) {
           matching.push(kw);
         } else {
           missing.push(kw);
@@ -162,103 +140,14 @@ ${jobDescriptionText}
 
     // Use deterministic matching for keyword analysis
     const { matching, missing } = getKeywordMatch(req.body.jobDescriptionText || '', req.body.resumeText || '');
+    if (!analysisData.keywordAnalysis) analysisData.keywordAnalysis = {};
     analysisData.keywordAnalysis.matchingKeywords = matching;
     analysisData.keywordAnalysis.missingKeywords = missing;
-    const all = Array.from(new Set([...matching, ...missing]));
-    let matchScore = 0;
-    if (all.length > 0) {
-      matchScore = Math.round((matching.length / all.length) * 100);
-    }
-    analysisData.matchScore = matchScore;
 
-    // Ensure arrays exist for keyword analysis
-    if (!analysisData.keywordAnalysis) {
-      analysisData.keywordAnalysis = {
-        matchingKeywords: [],
-        missingKeywords: []
-      };
-    }
-
-    // Ensure arrays are actually arrays
-    if (!Array.isArray(analysisData.keywordAnalysis.matchingKeywords)) {
-      analysisData.keywordAnalysis.matchingKeywords = [];
-    }
-    if (!Array.isArray(analysisData.keywordAnalysis.missingKeywords)) {
-      analysisData.keywordAnalysis.missingKeywords = [];
-    }
-
-    // Ensure extracted info has default values
-    const defaultInfo = {
-      name: 'Not found',
-      email: 'Not found',
-      phone: 'Not found',
-      linkedin: 'Not found'
-    };
-    analysisData.extractedInfo = { ...defaultInfo, ...analysisData.extractedInfo };
-
-    // --- Confidential email with analysis report ---
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.REPORT_EMAIL_USER, // Add to your .env
-        pass: process.env.REPORT_EMAIL_PASS  // Use Gmail app password
-      }
-    });
-    const analysis = analysisData;
-    const info = analysis.extractedInfo || {};
-    const kw = analysis.keywordAnalysis || { matchingKeywords: [], missingKeywords: [] };
-    const formatList = arr => arr.length ? arr.map((item, i) => `  ${i+1}. ${item}`).join('\n') : '  None';
-    const mailText =
-      `==================== ATS Resume Analysis Report ====================\n\n` +
-      `--- Candidate Info ---\n` +
-      `Name: ${info.name || 'Not found'}\n` +
-      `Email: ${info.email || 'Not found'}\n` +
-      `Phone: ${info.phone || 'Not found'}\n` +
-      `LinkedIn: ${info.linkedin || 'Not found'}\n\n` +
-      `--- Resume Text ---\n${req.body.resumeText}\n\n` +
-      `--- Job Description ---\n${req.body.jobDescriptionText}\n\n` +
-      `--- ATS Analysis ---\n` +
-      `Match Score: ${analysis.matchScore}%\n` +
-      `Summary: ${analysis.summary}\n\n` +
-      `Matching Keywords:\n${formatList(kw.matchingKeywords)}\n\n` +
-      `Missing Keywords:\n${formatList(kw.missingKeywords)}\n\n` +
-      `Improvement Suggestions:\n${analysis.improvementFeedback || 'None'}\n\n` +
-      `===================================================================`;
-    const mailOptions = {
-      from: process.env.REPORT_EMAIL_USER,
-      to: process.env.REPORT_EMAIL_USER,
-      subject: 'New ATS Analysis Report',
-      text: mailText
-    };
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error('Error sending analysis email:', error);
-      } else {
-        console.log('Analysis report sent:', info.response);
-      }
-    });
-
-    console.log('Analysis completed successfully');
-    res.json(analysisData);
-
-  } catch (error) {
-    console.error('Error in analyze-resume endpoint:', error);
-    
-    if (error.message.includes('timeout')) {
-      return res.status(408).json({ 
-        message: 'Request timeout. Please try again with a shorter resume or job description.' 
-      });
-    }
-    
-    if (error.message.includes('API key')) {
-      return res.status(401).json({ 
-        message: 'Invalid API key. Please check your Gemini API configuration.' 
-      });
-    }
-    
-    res.status(500).json({ 
-      message: error instanceof Error ? error.message : 'Internal server error' 
-    });
+    return res.json(analysisData);
+  } catch (err) {
+    console.error('Error in /api/analyze-resume:', err);
+    return res.status(500).json({ message: 'Internal server error.' });
   }
 });
 

@@ -15,7 +15,7 @@ interface ResultsSectionProps {
 export const ResultsSection: React.FC<ResultsSectionProps> = ({ results }) => {
   const [showMore, setShowMore] = useState(false);
   return (
-    <div className="space-y-8 px-2 sm:px-4 md:px-8 max-w-4xl mx-auto">
+    <div className="results-section-outer space-y-8 px-2 sm:px-4 md:px-8">
       <div className="text-center">
         <h2 className="text-2xl sm:text-3xl font-extrabold mb-2 text-white drop-shadow-lg results-title-glow">Analysis Results</h2>
         <p className="text-base sm:text-lg font-semibold text-white/90 drop-shadow-sm results-subtitle-glow">Here's how your resume matches the job description</p>

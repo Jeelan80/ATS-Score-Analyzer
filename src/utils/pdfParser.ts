@@ -14,7 +14,7 @@ export async function extractTextFromPDF(file: File): Promise<PDFExtractedInfo> 
   try {
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-    const lines: string[] = [];
+    const allTextItems: string[] = [];
     let foundLinkedin: string | undefined;
     let foundGithub: string | undefined;
     let foundEmail: string | undefined;
@@ -22,14 +22,11 @@ export async function extractTextFromPDF(file: File): Promise<PDFExtractedInfo> 
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
       const page = await pdf.getPage(pageNum);
       const textContent = await page.getTextContent();
-      // Join text items for each line, preserving line breaks
-      let line = '';
       textContent.items.forEach((item) => {
         if ('str' in item && typeof item.str === 'string') {
-          line += item.str;
+          allTextItems.push(item.str);
         }
       });
-      if (line.trim()) lines.push(line.trim());
 
       // --- Extract hyperlinks from annotations ---
       const annotations = await page.getAnnotations();
@@ -44,7 +41,9 @@ export async function extractTextFromPDF(file: File): Promise<PDFExtractedInfo> 
         }
       }
     }
-    const fullText = lines.join('\n');
+    // Join all text items into a single string, normalize whitespace
+    let fullText = allTextItems.join(' ');
+    fullText = fullText.replace(/\s+/g, ' ').replace(/\n+/g, ' ').trim();
     // Regex for LinkedIn, GitHub, and email in visible text (fallback)
     if (!foundLinkedin) {
       // Try full LinkedIn URL

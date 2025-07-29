@@ -177,7 +177,7 @@ function App() {
         {/* Navbar always on top */}
         <Navbar />
         {/* Add top padding to prevent overlap with fixed navbar */}
-        <main className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-28">
+        <main className="relative z-10 max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-28">
           {!results && !error && (
             <>
               <div className="text-center mb-12">
