@@ -69,7 +69,14 @@ ATS Resume Analyzer is a modern, open-source web application that helps you opti
 - **Deterministic ATS Score Calculation**: The backend now uses a robust, deterministic algorithm to extract keywords from the job description and match them against the resume. This ensures the ATS match score is always accurate and does not fluctuate due to AI inconsistencies.
 - **PDF Download Improvements**: The PDF report generation now handles keywords with special characters correctly, preventing errors and ensuring all analysis sections are included.
 - **.env Example**: See below for a sample .env configuration.
----env example is removed due to deployement issue---
+
+## .env Example
+
+```
+GEMINI_API_KEY=your_gemini_api_key_here
+VITE_API_URL=http://localhost:3001
+PORT=3001
+```
 
 ## Project Structure
 

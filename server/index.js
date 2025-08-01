@@ -7,7 +7,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import nodemailer from 'nodemailer';
+// ...existing code...
 
 // Load environment variables
 dotenv.config();
